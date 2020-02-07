@@ -4,7 +4,10 @@
 #define GAMEWINDOW_H
 
 #include <SDL.h>
+#include <SDL_opengl.h>
 #undef main
+
+#include "logger.h"
 
 namespace Graphics
 {
@@ -21,13 +24,18 @@ namespace Graphics
 		// Update the screen with the rendered content
 		void Draw();
 
+		GameWindow(GameWindow const&) = delete;
+		void operator=(GameWindow const&) = delete;
+
 	private:
 
 		GameWindow();
 		virtual ~GameWindow();
 
+		Logger &m_Logger;
+
 		SDL_Window* m_Window;
-		SDL_Renderer* m_Renderer;
+		SDL_GLContext m_GLContext;
 
 	};
 

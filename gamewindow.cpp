@@ -6,7 +6,7 @@ static const char* Title = "Scratchpad";
 
 static const int PosX = 50, PosY = 50, Width = 640, Height = 480;
 
-GameWindow & Graphics::GameWindow::Get()
+GameWindow & GameWindow::Get()
 {
 	static GameWindow gameWindow; // TODO: I need to properly understand how static works
 	return gameWindow;
@@ -22,23 +22,32 @@ void GameWindow::Render(/*DrawableObject &obj*/)
 
 void GameWindow::Draw()
 {
+	
+	glViewport(0, 0, Width, Height);
+	glClearColor(1.f, 0.f, 1.f, 0.f);
+	glClear(GL_COLOR_BUFFER_BIT);
 
-	// Draw renderer contents to the screen
-	SDL_SetRenderDrawColor(m_Renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-	SDL_RenderClear(m_Renderer);
+	// Draw the draw queue here
 
-
-	SDL_RenderPresent(m_Renderer);
+	SDL_GL_SwapWindow(m_Window);
 }
 
-GameWindow::GameWindow()
+GameWindow::GameWindow() : m_Logger(Logger::Get())
 {
-	m_Window = SDL_CreateWindow(Title, PosX, PosY, Width, Height, SDL_WINDOW_SHOWN /*SDL_WINDOW_OPENGL*/);
-	m_Renderer = SDL_CreateRenderer(m_Window, -1, SDL_RENDERER_ACCELERATED);
+	m_Window = SDL_CreateWindow(Title, PosX, PosY, Width, Height, SDL_WINDOW_OPENGL);
+	m_GLContext = SDL_GL_CreateContext(m_Window);
+
+#ifdef _DEBUG
+	m_Logger.LogDebug("Created GameWindow");
+#endif
+
 }
 
 GameWindow::~GameWindow()
 {
-	SDL_DestroyRenderer(m_Renderer);
 	SDL_DestroyWindow(m_Window);
+
+#ifdef _DEBUG
+	m_Logger.LogDebug("Destroyed GameWindow");
+#endif
 }
