@@ -1,16 +1,24 @@
 #include "glshaderloader.h"
 
 #include <cstdlib>
+#include <fstream>
 
 using namespace Graphics;
 
+static const int ShaderBufferSize = 1024;
+
+Graphics::GLShaderLoader::GLShaderLoader() : m_Logger(Logger::Get())
+{
+}
+
 GLuint GLShaderLoader::GetShaderProgram(const char * vsFilename, const char * fsFilename)
 {
-	const char* vsShaderSource = nullptr; // TODO: Read vertex shader content
+	char vsShaderSource[ShaderBufferSize];
+	FileReader(vsFilename, vsShaderSource, ShaderBufferSize);
 	GLuint vertexShader = LoadShader(vsShaderSource, GL_VERTEX_SHADER);
-	const char* fsShaderSource = nullptr; // TODO: Read frag shader content
+	char fsShaderSource[ShaderBufferSize];
+	FileReader(fsFilename, fsShaderSource, ShaderBufferSize);
 	GLuint fragmentShader = LoadShader(fsShaderSource, GL_FRAGMENT_SHADER);
-
 
 	GLint success, logLength;
 	GLuint program = glCreateProgram();
@@ -23,12 +31,12 @@ GLuint GLShaderLoader::GetShaderProgram(const char * vsFilename, const char * fs
 	{
 		GLchar* log = (GLchar*)malloc(logLength);
 		glGetProgramInfoLog(program, logLength, NULL, log);
-		// m_Logger.LogError(log);
+		m_Logger.LogError(log);
 		free(log);
 	}
 	if (!success)
 	{
-		// m_Logger.LogError("Error linking shaders");
+		m_Logger.LogError("Error linking shaders");
 	}
 
 	glDeleteShader(vertexShader);
@@ -50,12 +58,33 @@ GLuint Graphics::GLShaderLoader::LoadShader(const char * shaderSource, GLenum sh
 	if (logLength > 0)
 	{
 		glGetShaderInfoLog(shader, logLength, NULL, log);
-		// m_Logger.LogError(log);
+		m_Logger.LogError(log);
 	}
 	if (!success)
 	{
-		// m_Logger.LogError("Error loading shader");
+		m_Logger.LogError("Error loading shader");
 	}
 	free(log);
 	return shader;
+}
+
+bool GLShaderLoader::FileReader(const char * filename, char* buffer, int bufferSize)
+{
+	std::ifstream filestream(filename);
+	char c;
+	int i;
+	for (i = 0; filestream.get(c); i++)
+	{
+		if (i >= bufferSize)
+		{
+			m_Logger.LogError("Shader larger than allocated buffer");
+			return false;
+		}
+		else 
+		{
+			buffer[i] = (char)c;
+		}
+	}
+	buffer[i] = '\0';
+	return true;
 }

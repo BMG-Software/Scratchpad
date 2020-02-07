@@ -6,6 +6,9 @@ static const char* Title = "Scratchpad";
 
 static const int PosX = 50, PosY = 50, Width = 640, Height = 480;
 
+static const char* VertexShaderFile = "vert.glsl";
+static const char* FragmentShaderFile = "frag.glsl";
+
 GameWindow & GameWindow::Get()
 {
 	static GameWindow gameWindow; // TODO: I need to properly understand how static works
@@ -37,9 +40,11 @@ GameWindow::GameWindow() : m_Logger(Logger::Get())
 	m_Window = SDL_CreateWindow(Title, PosX, PosY, Width, Height, SDL_WINDOW_OPENGL);
 	m_GLContext = SDL_GL_CreateContext(m_Window);
 
-#ifdef _DEBUG
-	m_Logger.LogDebug("Created GameWindow");
-#endif
+	glewInit();
+
+	m_ShaderProgram = m_ShaderLoader.GetShaderProgram(VertexShaderFile, FragmentShaderFile);
+
+	m_Logger.LogDebug("Created game window");
 
 }
 
@@ -47,7 +52,4 @@ GameWindow::~GameWindow()
 {
 	SDL_DestroyWindow(m_Window);
 
-#ifdef _DEBUG
-	m_Logger.LogDebug("Destroyed GameWindow");
-#endif
 }

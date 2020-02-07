@@ -4,8 +4,6 @@
 
 static const char* LogFilename = "scratchpad.log";
 
-
-
 Logger & Logger::Get()
 {
 	static Logger logger;
@@ -27,6 +25,7 @@ void Logger::LogError(const char * message)
 void Logger::Log(const char * message)
 {
 	m_LogFile << " " << message << "\n";
+	m_LogFile.flush();
 }
 
 Logger::Logger()

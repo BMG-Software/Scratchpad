@@ -4,9 +4,11 @@
 #define GAMEWINDOW_H
 
 #include <SDL.h>
+#include <GL/glew.h>
 #include <SDL_opengl.h>
 #undef main
 
+#include "glshaderloader.h"
 #include "logger.h"
 
 namespace Graphics
@@ -36,6 +38,9 @@ namespace Graphics
 
 		SDL_Window* m_Window;
 		SDL_GLContext m_GLContext;
+
+		GLShaderLoader m_ShaderLoader;
+		GLuint m_ShaderProgram;
 
 	};
 
