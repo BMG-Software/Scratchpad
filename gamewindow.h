@@ -18,21 +18,19 @@ namespace Graphics
 	{
 
 	public:
-		
-		static GameWindow &Get();
+
+		GameWindow();
+		virtual ~GameWindow();
 
 		// Draw a drawable game entity in the renderer
 		void Render(/*DrawableObject &obj*/);
 		// Update the screen with the rendered content
 		void Draw();
 
-		GameWindow(GameWindow const&) = delete;
-		void operator=(GameWindow const&) = delete;
+		//GameWindow(GameWindow const&) = delete;
+		//void operator=(GameWindow const&) = delete;
 
 	private:
-
-		GameWindow();
-		virtual ~GameWindow();
 
 		Logger &m_Logger;
 

@@ -2,7 +2,7 @@
 
 using namespace Logic;
 
-GameController::GameController() : m_GameWindow(Graphics::GameWindow::Get())
+GameController::GameController()
 {
 }
 

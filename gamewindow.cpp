@@ -16,13 +16,7 @@ static const GLfloat Vertices[] =
 	0.8f, -0.8f
 };
 
-GameWindow & GameWindow::Get()
-{
-	static GameWindow gameWindow; // TODO: I need to properly understand how static works
-	return gameWindow;
-}
-
-void GameWindow::Render(/*DrawableObject &obj*/)
+void GameWindow::Render(/*DrawableObject &obj*/) // TODO: Draw to back buffer
 {
 	// TODO: Lock rendering and drawing so we can't draw mid render (if we end up using threading this way...)
 
@@ -30,7 +24,7 @@ void GameWindow::Render(/*DrawableObject &obj*/)
 
 }
 
-void GameWindow::Draw()
+void GameWindow::Draw() // TOOD: Swap buffers
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 

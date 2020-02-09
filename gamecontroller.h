@@ -20,7 +20,7 @@ namespace Logic
 		void Run();
 
 	private:
-		Graphics::GameWindow &m_GameWindow;
+		Graphics::GameWindow m_GameWindow;
 		EventHandler m_EventHandler;
 
 	};
