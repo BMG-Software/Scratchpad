@@ -5,6 +5,7 @@
 
 #include <SDL.h>
 #include <GL/glew.h>
+#include <linmath.h>
 #include <SDL_opengl.h>
 #undef main
 
@@ -32,13 +33,17 @@ namespace Graphics
 
 	private:
 
+		void GenerateMVPMatrix(mat4x4 mvp);
+
 		Logger &m_Logger;
 
 		SDL_Window* m_Window;
 		SDL_GLContext m_GLContext;
 
 		GLShaderLoader m_ShaderLoader;
-		GLuint m_ShaderProgram, m_VBO, m_CBO;
+		GLuint m_ShaderProgram, m_VBO, m_CBO, m_MatrixID;
+
+		mat4x4 m_MVP;
 
 		GLint m_AttributeCoord3d, m_AttributeColour;
 

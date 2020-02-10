@@ -1,4 +1,4 @@
-#version 120
+#version 330 core
 
 in vec3 fragmentColour;
 void main()
