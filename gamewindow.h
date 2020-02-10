@@ -38,9 +38,9 @@ namespace Graphics
 		SDL_GLContext m_GLContext;
 
 		GLShaderLoader m_ShaderLoader;
-		GLuint m_ShaderProgram, m_VBO;
+		GLuint m_ShaderProgram, m_VBO, m_CBO;
 
-		GLint m_AttributeCoord2d;
+		GLint m_AttributeCoord3d, m_AttributeColour;
 
 	};
 
