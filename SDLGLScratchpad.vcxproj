@@ -171,7 +171,9 @@
     <ClInclude Include="gamecontroller.h" />
     <ClInclude Include="gamewindow.h" />
     <ClInclude Include="glshaderloader.h" />
+    <ClInclude Include="imodelloader.h" />
     <ClInclude Include="logger.h" />
+    <ClInclude Include="objmodelloader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="frag.glsl" />

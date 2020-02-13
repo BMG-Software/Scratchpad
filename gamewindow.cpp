@@ -9,6 +9,7 @@ static const int PosX = 50, PosY = 50, Width = 640, Height = 480;
 static const char* VertexShaderFile = "vert.glsl";
 static const char* FragmentShaderFile = "frag.glsl";
 
+/*
 static const GLfloat Vertices[] = 
 {
 	-1.0f,-1.0f,-1.0f, -1.0f,-1.0f, 1.0f, -1.0f, 1.0f, 1.0f,	// triangle 1
@@ -42,7 +43,7 @@ static const GLfloat VertexColours[] =
 	0.517f,  0.713f,  0.338f, 0.053f,  0.959f,  0.120f,	0.393f,  0.621f,  0.362f,
 	0.673f,  0.211f,  0.457f, 0.820f,  0.883f,  0.371f,	0.982f,  0.099f,  0.879f
 };
-
+*/
 
 GameWindow::GameWindow() : m_Logger(Logger::Get())
 {
@@ -59,6 +60,10 @@ GameWindow::GameWindow() : m_Logger(Logger::Get())
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(m_AttributeCoord3d, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glGenBuffers(1, &m_IBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO); // GL draw elements knows to use what is bound to the ELEMENT_ARRAY_BUFFER
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(/*indices*/), /*indices*/, GL_STATIC_DRAW);
 
 	glGenBuffers(1, &m_CBO); // Bind colours. A colour for each vertex
 	glBindBuffer(GL_ARRAY_BUFFER, m_CBO);
@@ -83,6 +88,7 @@ GameWindow::GameWindow() : m_Logger(Logger::Get())
 GameWindow::~GameWindow()
 {
 	glDeleteBuffers(1, &m_VBO);
+	glDeleteBuffers(1, &m_IBO);
 	glDeleteBuffers(1, &m_CBO);
 	glDeleteProgram(m_ShaderProgram);
 	SDL_GL_DeleteContext(m_GLContext);
@@ -107,7 +113,10 @@ void GameWindow::Draw() // TOOD: Swap buffers
 	// TODO: Draw the (eventual) draw queue here
 	glEnableVertexAttribArray(m_AttributeCoord3d);
 	glEnableVertexAttribArray(m_AttributeColour);
-	glDrawArrays(GL_TRIANGLES, 0, 12*3);
+
+	glDrawElements(GL_TRIANGLE_STRIP, 0/*TBD*/, GL_UNSIGNED_BYTE, (GLvoid*)0);
+
+	//glDrawArrays(GL_TRIANGLES, 0, 12*3);
 	glEnableVertexAttribArray(m_AttributeColour);
 	glDisableVertexAttribArray(m_AttributeCoord3d);
 	SDL_GL_SwapWindow(m_Window);

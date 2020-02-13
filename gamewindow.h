@@ -41,7 +41,7 @@ namespace Graphics
 		SDL_GLContext m_GLContext;
 
 		GLShaderLoader m_ShaderLoader;
-		GLuint m_ShaderProgram, m_VBO, m_CBO, m_MatrixID;
+		GLuint m_ShaderProgram, m_VBO, m_CBO, m_IBO, m_MatrixID;
 
 		mat4x4 m_MVP;
 
