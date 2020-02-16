@@ -11,6 +11,7 @@
 
 #include "glshaderloader.h"
 #include "logger.h"
+#include "objmodelloader.h"
 
 namespace Graphics
 {
@@ -46,6 +47,9 @@ namespace Graphics
 		mat4x4 m_MVP;
 
 		GLint m_AttributeCoord3d, m_AttributeColour;
+
+		ObjModel obj;
+		ObjModelLoader loader;
 
 	};
 

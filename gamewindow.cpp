@@ -52,23 +52,26 @@ GameWindow::GameWindow() : m_Logger(Logger::Get())
 
 	glewInit();
 
+	loader.LoadModel("cube.obj", obj);
+
 	m_ShaderProgram = m_ShaderLoader.GetShaderProgram(VertexShaderFile, FragmentShaderFile);
 	m_AttributeCoord3d = glGetAttribLocation(m_ShaderProgram, "coord3d");
 	m_AttributeColour = glGetAttribLocation(m_ShaderProgram, "colour");
 
 	glGenBuffers(1, &m_VBO); // Bind vertices. Vertices of a cube
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, obj.m_VertexCount, obj.m_Vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(m_AttributeCoord3d, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	glGenBuffers(1, &m_IBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO); // GL draw elements knows to use what is bound to the ELEMENT_ARRAY_BUFFER
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(/*indices*/), /*indices*/, GL_STATIC_DRAW);
-
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj.m_IndexCount, obj.m_Indices, GL_STATIC_DRAW);
+	
+	/*
 	glGenBuffers(1, &m_CBO); // Bind colours. A colour for each vertex
 	glBindBuffer(GL_ARRAY_BUFFER, m_CBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexColours), VertexColours, GL_STATIC_DRAW);
-	glVertexAttribPointer(m_AttributeColour, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(m_AttributeColour, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 
 	glEnable(GL_DEPTH_TEST);  // Enabling Z buffer.
 	glDepthFunc(GL_LESS);
@@ -79,7 +82,7 @@ GameWindow::GameWindow() : m_Logger(Logger::Get())
 	m_MatrixID = glGetUniformLocation(m_ShaderProgram, "mvp");
 
 	glViewport(0, 0, Width, Height);
-	glClearColor(1.f, 0.f, 1.f, 0.f);
+	glClearColor(0.f, 1.f, 0.f, 0.f);
 
 	m_Logger.LogDebug("Created game window");
 
@@ -112,12 +115,12 @@ void GameWindow::Draw() // TOOD: Swap buffers
 
 	// TODO: Draw the (eventual) draw queue here
 	glEnableVertexAttribArray(m_AttributeCoord3d);
-	glEnableVertexAttribArray(m_AttributeColour);
+	//glEnableVertexAttribArray(m_AttributeColour);
 
-	glDrawElements(GL_TRIANGLE_STRIP, 0/*TBD*/, GL_UNSIGNED_BYTE, (GLvoid*)0);
+	glDrawElements(GL_TRIANGLE_STRIP, obj.m_VertexCount, GL_UNSIGNED_BYTE, 0);
 
 	//glDrawArrays(GL_TRIANGLES, 0, 12*3);
-	glEnableVertexAttribArray(m_AttributeColour);
+	//glEnableVertexAttribArray(m_AttributeColour);
 	glDisableVertexAttribArray(m_AttributeCoord3d);
 	SDL_GL_SwapWindow(m_Window);
 }
