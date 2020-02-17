@@ -17,7 +17,7 @@ namespace Graphics
 	struct ObjModel
 	{
 		GLfloat m_Vertices[MaxVertices];
-		GLubyte m_Indices[MaxIndices];
+		GLushort m_Indices[MaxIndices];
 
 		int m_VertexCount, m_IndexCount;
 	};
