@@ -55,8 +55,6 @@ void GameWindow::HandleGLErrors(GLenum err)
 	}
 }
 
-
-
 GameWindow::GameWindow() : m_Logger(Logger::Get())
 {
 	m_Window = SDL_CreateWindow(Title, PosX, PosY, Width, Height, SDL_WINDOW_OPENGL);
@@ -64,7 +62,7 @@ GameWindow::GameWindow() : m_Logger(Logger::Get())
 
 	glewInit();
 
-	loader.LoadModel("cube.obj", obj);
+	loader.LoadModel("octa.obj", obj);
 
 	m_ShaderProgram = m_ShaderLoader.GetShaderProgram(VertexShaderFile, FragmentShaderFile);
 	m_AttributeCoord3d = glGetAttribLocation(m_ShaderProgram, "coord3d");
@@ -85,6 +83,8 @@ GameWindow::GameWindow() : m_Logger(Logger::Get())
 	glVertexAttribPointer(m_AttributeColour, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		
 	glEnable(GL_DEPTH_TEST);  // Enabling Z buffer.
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK); // GL_FRONT, GL_BACK, GL_FRONT_AND_BACK -> options for culling
 	glDepthFunc(GL_LESS);
 
 	// Model, View, Projection
@@ -122,15 +122,16 @@ void GameWindow::Draw() // TOOD: Swap buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(m_ShaderProgram);
 
+	AnimateMVP(m_MVP);
+
 	glUniformMatrix4fv(m_MatrixID, 1, GL_FALSE, &m_MVP[0][0]);
 
 	// TODO: Draw the (eventual) draw queue here
 	glEnableVertexAttribArray(m_AttributeCoord3d);
 	glEnableVertexAttribArray(m_AttributeColour);
 	
-	glDrawElements(GL_TRIANGLE_STRIP, obj.m_IndexCount, GL_UNSIGNED_SHORT, (void*)0);
+	glDrawElements(GL_TRIANGLES, obj.m_IndexCount, GL_UNSIGNED_SHORT, (void*)0);
 	
-	//glDrawArrays(GL_TRIANGLE_STRIP, 0, 12*3);
 	glEnableVertexAttribArray(m_AttributeColour);
 	glDisableVertexAttribArray(m_AttributeCoord3d);
 	SDL_GL_SwapWindow(m_Window);
@@ -147,4 +148,14 @@ void GameWindow::GenerateMVPMatrix(mat4x4 mvp)
 	mat4x4 intermediate;
 	mat4x4_mul(intermediate, projection, view);
 	mat4x4_mul(mvp, intermediate, model);
+}
+
+void GameWindow::AnimateMVP(mat4x4 mvp)
+{
+	float angle = SDL_GetTicks() / 1000.f * 45;
+	vec3 axisY = { 0, 1, 0 };
+	mat4x4 anim, identity;
+	mat4x4_identity(identity);
+	mat4x4_rotate(anim, identity, axisY[0], axisY[1], axisY[2], angle);
+	mat4x4_mul(mvp, mvp, anim);
 }

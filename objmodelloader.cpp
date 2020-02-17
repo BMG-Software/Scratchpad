@@ -29,32 +29,58 @@ bool ObjModelLoader::LoadModel(const char* objFilename, ObjModel& obj)
 		do
 		{
 			m_FileReader.getline(line, MaxLineLength);
-			char* token = NULL, *nextToken = NULL;
-			token = strtok_s(line, " ", &nextToken);
-			if (token == NULL) continue;
-			if (strcmp(token, "v") == 0)
+			if (!LoadVertices(line, obj))
 			{
-				token = strtok_s(NULL, " ", &nextToken);
-				while (token != NULL)
+				if (!LoadIndices(line, obj))
 				{
-					obj.m_Vertices[obj.m_VertexCount] = (GLfloat)atof(token);
-					obj.m_VertexCount++;
-					token = strtok_s(NULL, " ", &nextToken);
-				}
-			}
-			else if (strcmp(token, "f") == 0)
-			{
-				token = strtok_s(NULL, " ", &nextToken);
-				while (token != NULL)
-				{
-					obj.m_Indices[obj.m_IndexCount] = ((GLushort)atoi(token) - 1); // Normalise so indices should start at 0
-					obj.m_IndexCount++;
-					token = strtok_s(NULL, " ", &nextToken);
+					m_Logger.LogDebug("Skipping unsupported line type in .obj file");
 				}
 			}
 		} while (!m_FileReader.eof());
 		result = true;
 	}
 	m_FileReader.close();
+	return result;
+}
+
+bool Graphics::ObjModelLoader::LoadVertices(const char* line, ObjModel& model)
+{
+	bool result = false;
+	char *token = NULL, *nextToken = NULL;
+	char lineCopy[MaxLineLength];
+	strncpy_s(lineCopy, line, MaxLineLength);
+	token = strtok_s(lineCopy, " ", &nextToken); 
+	if (token != NULL && strcmp(token, "v") == 0)
+	{
+		token = strtok_s(NULL, " ", &nextToken);
+		while (token != NULL)
+		{
+			model.m_Vertices[model.m_VertexCount] = (GLfloat)atof(token);
+			model.m_VertexCount++;
+			token = strtok_s(NULL, " ", &nextToken);
+		}
+		result = true;
+	}
+	return result;
+}
+
+bool Graphics::ObjModelLoader::LoadIndices(const char* line, ObjModel& model)
+{
+	bool result = false;
+	char *token = NULL, *nextToken = NULL;
+	char lineCopy[MaxLineLength];
+	strncpy_s(lineCopy, line, MaxLineLength);
+	token = strtok_s(lineCopy, " ", &nextToken);
+	if (token != NULL && strcmp(token, "f") == 0)
+	{
+		token = strtok_s(NULL, " ", &nextToken);
+		while (token != NULL)
+		{
+			model.m_Indices[model.m_IndexCount] = ((GLushort)atoi(token) - 1); // Normalise to reflect 0 based indexing
+			model.m_IndexCount++;
+			token = strtok_s(NULL, " ", &nextToken);
+		}
+		result = true;
+	}
 	return result;
 }

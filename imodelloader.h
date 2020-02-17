@@ -5,14 +5,14 @@
 namespace Graphics
 {
 
+	struct Model
+	{};
+
 	class IModelLoader
 	{
 
 	public:
 		virtual ~IModelLoader() {}
-
-
-
 	};
 
 }

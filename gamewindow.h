@@ -26,17 +26,14 @@ namespace Graphics
 
 		// Draw a drawable game entity in the renderer
 		void Render(/*DrawableObject &obj*/);
-		// Update the screen with the rendered content
-		void Draw();
-
-		//GameWindow(GameWindow const&) = delete;
-		//void operator=(GameWindow const&) = delete;
+		void Draw(); // Update the screen with the rendered content
 
 	private:
 
 		void HandleGLErrors(GLenum err);
-
 		void GenerateMVPMatrix(mat4x4 mvp);
+		void AnimateMVP(mat4x4 mvp); // adds a little bit of animation to spin models
+
 
 		Logger &m_Logger;
 

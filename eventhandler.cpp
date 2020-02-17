@@ -2,6 +2,10 @@
 
 using namespace Logic;
 
+
+// Use a map to map keys to callbacks. Run through the keys and callbacks together
+
+
 bool EventHandler::HandleEvents()
 {
 	bool retVal = true;
