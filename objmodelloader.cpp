@@ -47,7 +47,7 @@ bool ObjModelLoader::LoadModel(const char* objFilename, ObjModel& obj)
 				token = strtok_s(NULL, " ", &nextToken);
 				while (token != NULL)
 				{
-					obj.m_Indices[obj.m_IndexCount] = (GLubyte)atoi(token);
+					obj.m_Indices[obj.m_IndexCount] = ((GLushort)atoi(token) - 1); // Normalise so indices should start at 0
 					obj.m_IndexCount++;
 					token = strtok_s(NULL, " ", &nextToken);
 				}

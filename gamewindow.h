@@ -34,6 +34,8 @@ namespace Graphics
 
 	private:
 
+		void HandleGLErrors(GLenum err);
+
 		void GenerateMVPMatrix(mat4x4 mvp);
 
 		Logger &m_Logger;
