@@ -5,6 +5,7 @@
 
 #include "gamewindow.h"
 #include "eventhandler.h"
+#include "objmodelloader.h"
 
 namespace Logic
 {
@@ -22,6 +23,7 @@ namespace Logic
 	private:
 		Graphics::GameWindow m_GameWindow;
 		EventHandler m_EventHandler;
+		Graphics::ObjModelLoader m_ModelLoader;
 
 	};
 

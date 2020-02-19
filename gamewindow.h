@@ -9,6 +9,8 @@
 #include <SDL_opengl.h>
 #undef main
 
+#include <vector>
+
 #include "glshaderloader.h"
 #include "logger.h"
 #include "objmodelloader.h"
@@ -24,8 +26,8 @@ namespace Graphics
 		GameWindow();
 		virtual ~GameWindow();
 
-		// Draw a drawable game entity in the renderer
-		void Render(/*DrawableObject &obj*/);
+		void AddDrawableObject(ObjModel* model); // TODO: need a remove as well at some point
+
 		void Draw(); // Update the screen with the rendered content
 
 	private:
@@ -47,8 +49,7 @@ namespace Graphics
 
 		GLint m_AttributeCoord3d, m_AttributeColour;
 
-		ObjModel obj;
-		ObjModelLoader loader;
+		std::vector<ObjModel*> m_Models;
 
 	};
 

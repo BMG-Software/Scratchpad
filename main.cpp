@@ -2,8 +2,6 @@
 #include <SDL.h>
 #include "gamecontroller.h"
 
-#include "objmodelloader.h"
-
 int WinMain()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) // TODO: Move SDL specific stuff into gamewindow

@@ -62,26 +62,19 @@ GameWindow::GameWindow() : m_Logger(Logger::Get())
 
 	glewInit();
 
-	loader.LoadModel("octa.obj", obj);
-
 	m_ShaderProgram = m_ShaderLoader.GetShaderProgram(VertexShaderFile, FragmentShaderFile);
 	m_AttributeCoord3d = glGetAttribLocation(m_ShaderProgram, "coord3d");
 	m_AttributeColour = glGetAttribLocation(m_ShaderProgram, "colour");
 
 	glGenBuffers(1, &m_VBO); // Bind vertices. Vertices of a cube
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(obj.m_Vertices), &obj.m_Vertices[0], GL_STATIC_DRAW);
-	glVertexAttribPointer(m_AttributeCoord3d, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		
-	glGenBuffers(1, &m_IBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO); // GL draw elements knows to use what is bound to the ELEMENT_ARRAY_BUFFER
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(obj.m_Indices), &obj.m_Indices[0], GL_STATIC_DRAW);
-	
+
 	glGenBuffers(1, &m_CBO); // Bind colours. A colour for each vertex
 	glBindBuffer(GL_ARRAY_BUFFER, m_CBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexColours), VertexColours, GL_STATIC_DRAW);
 	glVertexAttribPointer(m_AttributeColour, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		
+	glGenBuffers(1, &m_IBO);
+
 	glEnable(GL_DEPTH_TEST);  // Enabling Z buffer.
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK); // GL_FRONT, GL_BACK, GL_FRONT_AND_BACK -> options for culling
@@ -109,12 +102,9 @@ GameWindow::~GameWindow()
 	SDL_DestroyWindow(m_Window);
 }
 
-void GameWindow::Render(/*DrawableObject &obj*/) // TODO: Draw to back buffer
+void GameWindow::AddDrawableObject(ObjModel* model)
 {
-	// TODO: Lock rendering and drawing so we can't draw mid render (if we end up using threading this way...)
-
-	// Render object
-
+	m_Models.push_back(model);
 }
 
 void GameWindow::Draw() // TOOD: Swap buffers
@@ -122,18 +112,32 @@ void GameWindow::Draw() // TOOD: Swap buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(m_ShaderProgram);
 
-	AnimateMVP(m_MVP);
+	for (ObjModel *model : m_Models) // Draw each model we have a reference to
+	{
 
-	glUniformMatrix4fv(m_MatrixID, 1, GL_FALSE, &m_MVP[0][0]);
+		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(model->m_Vertices), &model->m_Vertices[0], GL_STATIC_DRAW);
+		glVertexAttribPointer(m_AttributeCoord3d, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-	// TODO: Draw the (eventual) draw queue here
-	glEnableVertexAttribArray(m_AttributeCoord3d);
-	glEnableVertexAttribArray(m_AttributeColour);
-	
-	glDrawElements(GL_TRIANGLES, obj.m_IndexCount, GL_UNSIGNED_SHORT, (void*)0);
-	
-	glEnableVertexAttribArray(m_AttributeColour);
-	glDisableVertexAttribArray(m_AttributeCoord3d);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO); // GL draw elements knows to use what is bound to the ELEMENT_ARRAY_BUFFER
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(model->m_Indices), &model->m_Indices[0], GL_STATIC_DRAW);
+
+		// AnimateMVP(m_MVP);
+
+		glUniformMatrix4fv(m_MatrixID, 1, GL_FALSE, &m_MVP[0][0]);
+
+		// TODO: Draw the (eventual) draw queue here
+		glEnableVertexAttribArray(m_AttributeCoord3d);
+		glEnableVertexAttribArray(m_AttributeColour);
+
+		glDrawElements(GL_TRIANGLES, model->m_IndexCount, GL_UNSIGNED_SHORT, (void*)0);
+
+		glEnableVertexAttribArray(m_AttributeColour);
+		glDisableVertexAttribArray(m_AttributeCoord3d);
+
+		// TODO: Unbind buffers for safety here
+
+	}
 	SDL_GL_SwapWindow(m_Window);
 }
 
