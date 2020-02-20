@@ -3,6 +3,7 @@
 
 #include <fstream>
 
+#include <SDL.h>
 #include <SDL_opengl.h>
 
 #include "imodelloader.h"
@@ -20,6 +21,8 @@ namespace Graphics
 		GLfloat m_Vertices[MaxVertices];
 		GLushort m_Indices[MaxIndices];
 
+		SDL_Surface* m_Texture;
+
 		int m_VertexCount, m_IndexCount;
 	};
 
@@ -29,12 +32,17 @@ namespace Graphics
 
 	public:
 		ObjModelLoader();
-		virtual ~ObjModelLoader();
+		virtual ~ObjModelLoader() = default;
 
 		bool LoadModel(const char* objFilename, ObjModel& obj);
 
 	private:
 
+		void InitialiseModel(ObjModel& obj);
+
+		bool LoadMaterial(const char* line, ObjModel& obj);
+
+		bool LoadTexture(const char* textureFilename, ObjModel& obj);
 		bool LoadVertices(const char* line, ObjModel& model);
 		bool LoadIndices(const char* line, ObjModel& model);
 

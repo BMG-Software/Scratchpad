@@ -2,6 +2,8 @@
 
 #include "objmodelloader.h"
 
+#include <SDL_image.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -13,15 +15,11 @@ ObjModelLoader::ObjModelLoader() : m_Logger(Logger::Get())
 {
 }
 
-ObjModelLoader::~ObjModelLoader()
-{
-}
-
 bool ObjModelLoader::LoadModel(const char* objFilename, ObjModel& obj)
 {
 	bool result = false;
-	obj.m_IndexCount = 0;
-	obj.m_VertexCount = 0;
+	InitialiseModel(obj); // Initialise to a clean, known state
+	// All of this is .obj file handling
 	m_FileReader.open(objFilename, std::fstream::in);
 	if (m_FileReader.is_open())
 	{
@@ -29,11 +27,14 @@ bool ObjModelLoader::LoadModel(const char* objFilename, ObjModel& obj)
 		do
 		{
 			m_FileReader.getline(line, MaxLineLength);
-			if (!LoadVertices(line, obj))
+			if (!LoadMaterial(line, obj))
 			{
-				if (!LoadIndices(line, obj))
+				if (!LoadVertices(line, obj))
 				{
-					m_Logger.LogDebug("Skipping unsupported line type in .obj file");
+					if (!LoadIndices(line, obj))
+					{
+						m_Logger.LogDebug("Skipping unsupported line type in .obj file");
+					}
 				}
 			}
 		} while (!m_FileReader.eof());
@@ -41,6 +42,48 @@ bool ObjModelLoader::LoadModel(const char* objFilename, ObjModel& obj)
 	}
 	m_FileReader.close();
 	return result;
+}
+
+void Graphics::ObjModelLoader::InitialiseModel(ObjModel & obj)
+{
+	obj.m_IndexCount = 0;
+	obj.m_VertexCount = 0;
+	memset(obj.m_Vertices, 0, MaxVertices);
+	memset(obj.m_Indices, 0, MaxIndices);
+	obj.m_Texture = nullptr;
+}
+
+bool Graphics::ObjModelLoader::LoadMaterial(const char * line, ObjModel &)
+{
+	bool result = false;
+	char *token = NULL, *nextToken = NULL;
+	char lineCopy[MaxLineLength];
+	strncpy_s(lineCopy, line, MaxLineLength);
+	token = strtok_s(lineCopy, " ", &nextToken);
+	if (token != NULL && strcmp(token, "mtllib") == 0)
+	{
+		std::ifstream fileReader;
+		fileReader.open(nextToken, std::fstream::in);
+		if (fileReader.is_open())
+		{
+			m_Logger.LogDebug("Successfully opened material file");
+			// TODO: Load the material file
+
+		}
+		fileReader.close();
+	}
+	return result;
+}
+
+bool Graphics::ObjModelLoader::LoadTexture(const char * textureFilename, ObjModel & obj)
+{
+	obj.m_Texture = IMG_Load(textureFilename);
+	if (obj.m_Texture == nullptr)
+	{
+		m_Logger.LogError("Failed to load obj model texture");
+		return false;
+	}
+	return true;
 }
 
 bool Graphics::ObjModelLoader::LoadVertices(const char* line, ObjModel& model)
