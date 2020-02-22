@@ -20,6 +20,22 @@ namespace Graphics
 	static const int MaxVertexNormals	= 512;
 	static const int MaxNormalIndices	= 512;
 
+
+	struct TexturedMaterial
+	{
+
+		GLfloat m_AmbientColour[3];
+		GLfloat m_DiffuseColour[3];
+		GLfloat m_SpecularColour[3];
+		GLfloat m_SpecularExponent;
+
+		GLfloat m_Dissolved; // Transparent
+
+		SDL_Surface* m_TextureMap;
+
+	};
+
+
 	// Structure that wraps .obj 3D model data
 	struct ObjModel
 	{
@@ -33,7 +49,7 @@ namespace Graphics
 		std::vector<GLfloat> m_VertexNormals;
 		std::vector<GLushort> m_NormalIndices;
 
-		SDL_Surface* m_Texture;
+		TexturedMaterial m_Material;
 
 	};
 

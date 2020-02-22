@@ -1,10 +1,11 @@
 
 #include <SDL.h>
+#include <SDL_image.h>
 #include "gamecontroller.h"
 
 int WinMain()
 {
-	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) // TODO: Move SDL specific stuff into gamewindow
+	if (SDL_Init(SDL_INIT_EVERYTHING) == 0 && (IMG_Init(IMG_INIT_PNG)&IMG_INIT_PNG) == IMG_INIT_PNG) // TODO: Move SDL specific stuff into gamewindow
 	{
 		// TODO: Log success
 		Logic::GameController gameController;

@@ -25,13 +25,11 @@ namespace Graphics
 
 	private:
 
-		void InitialiseModel(ObjModel& obj);
-
-		bool LoadMaterial(const char* line, ObjModel& obj);
-
-		bool LoadTexture(const char* textureFilename, ObjModel& obj);
 		bool LoadVertices(const char* line, ObjModel& model);
 		bool LoadIndices(const char* line, ObjModel& model);
+
+		bool FindMaterialFile(const char* line, TexturedMaterial& mtl);
+		bool LoadMaterial(const char* materialFilename, TexturedMaterial& mtl);
 
 		Logger& m_Logger;
 		std::ifstream m_FileReader;

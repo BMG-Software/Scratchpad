@@ -11,6 +11,8 @@ using namespace Graphics;
 
 static const int MaxLineLength = 256;
 
+static const std::string Fileprefix = "resources/materialcube/";
+
 ObjModelLoader::ObjModelLoader() : m_Logger(Logger::Get())
 {
 }
@@ -18,17 +20,16 @@ ObjModelLoader::ObjModelLoader() : m_Logger(Logger::Get())
 bool ObjModelLoader::LoadModel(const char* objFilename, ObjModel& obj)
 {
 	bool result = false;
-	InitialiseModel(obj); // Initialise to a clean, known state
-	// All of this is .obj file handling
+	std::string fullFilepath = Fileprefix + std::string(objFilename);
 	std::ifstream filereader;
-	filereader.open(objFilename, std::fstream::in);
+	filereader.open(fullFilepath.c_str(), std::fstream::in);
 	if (filereader.is_open())
 	{
 		char line[MaxLineLength];
 		do
 		{
 			filereader.getline(line, MaxLineLength);
-			if (!LoadMaterial(line, obj))
+			if (!FindMaterialFile(line, obj.m_Material))
 			{
 				if (!LoadVertices(line, obj))
 				{
@@ -45,12 +46,7 @@ bool ObjModelLoader::LoadModel(const char* objFilename, ObjModel& obj)
 	return result;
 }
 
-void ObjModelLoader::InitialiseModel(ObjModel & obj) // TODO: Remove
-{
-	obj.m_Texture = nullptr;
-}
-
-bool ObjModelLoader::LoadMaterial(const char * line, ObjModel &)
+bool ObjModelLoader::FindMaterialFile(const char * line, TexturedMaterial& mtl)
 {
 	bool result = false;
 	char *token = NULL, *nextToken = NULL;
@@ -59,32 +55,73 @@ bool ObjModelLoader::LoadMaterial(const char * line, ObjModel &)
 	token = strtok_s(lineCopy, " ", &nextToken);
 	if (token != NULL && strcmp(token, "mtllib") == 0)
 	{
-		std::ifstream fileReader;
-		fileReader.open(nextToken, std::fstream::in);
-		if (fileReader.is_open())
-		{
-			m_Logger.LogDebug("Successfully opened material file");
-			// TODO: Load the material file
-
-		}
-		else
-		{
-			m_Logger.LogError("Material file not found");
-		}
-		fileReader.close();
+		result = LoadMaterial(nextToken, mtl);
 	}
 	return result;
 }
 
-bool ObjModelLoader::LoadTexture(const char * textureFilename, ObjModel & obj)
+bool ObjModelLoader::LoadMaterial(const char* materialFilename, TexturedMaterial& mtl)
 {
-	obj.m_Texture = IMG_Load(textureFilename);
-	if (obj.m_Texture == nullptr)
+	bool result = false;
+	std::ifstream fileReader;
+	std::string fullFilepath = Fileprefix + std::string(materialFilename);
+	fileReader.open(fullFilepath, std::fstream::in);
+	if (fileReader.is_open())
 	{
-		m_Logger.LogError("Failed to load obj model texture");
-		return false;
+		m_Logger.LogDebug("Successfully opened material file");
+		char line[MaxLineLength];
+		char *token = NULL, *nextToken = NULL;
+		do
+		{
+			fileReader.getline(line, MaxLineLength);
+			token = strtok_s(line, " ", &nextToken);
+			while (token != NULL)
+			{
+				/* // TODO: Handle all the extra material related stuff
+				if (strcmp(token, "Ka") == 0)
+				{
+					
+				}
+				else if (strcmp(token, "Kd") == 0)
+				{
+
+				}
+				else if (strcmp(token, "Ks") == 0)
+				{
+
+				}
+				else if (strcmp(token, "Ns") == 0)
+				{
+
+				}
+				else if (strcmp(token, "d") == 0 || strcmp(token, "Tr") == 0)
+				{
+
+				}
+				else */
+				if (strcmp(token, "map_Ka") == 0)
+				{
+					std::string materialFilepath = Fileprefix + std::string(nextToken);
+					mtl.m_TextureMap = IMG_Load(materialFilepath.c_str());
+					result = (mtl.m_TextureMap != nullptr);
+					if (!result)
+					{
+						m_Logger.LogError("Failed to load obj model texture");
+						m_Logger.LogError(SDL_GetError());
+						break;
+					}
+				}
+				token = strtok_s(NULL, " ", &nextToken);
+			}
+
+		} while (!fileReader.eof());
 	}
-	return true;
+	else
+	{
+		m_Logger.LogError("Material file not found");
+	}
+	fileReader.close();
+	return result;
 }
 
 bool ObjModelLoader::LoadVertices(const char* line, ObjModel& model)
@@ -133,7 +170,7 @@ bool ObjModelLoader::LoadIndices(const char* line, ObjModel& model)
 		while (token != NULL)
 		{
 			// NOTE: This is not robust at all, will probably improve in the future but this
-			// is very low priority for this project
+			// is very low priority for this project at this stage. We're all about opengl here
 
 			model.m_Indices.push_back((GLushort)atoi(token) - 1);
 			token = strtok_s(NULL, " /", &nextToken);
