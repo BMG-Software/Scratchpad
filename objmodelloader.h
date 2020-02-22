@@ -6,26 +6,13 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
+#include "objmodel.h"
 #include "imodelloader.h"
 #include "logger.h"
 
 namespace Graphics
 {
-	// Temporary values for the maximum vertices and indices
-	static const int MaxVertices = 128;
-	static const int MaxIndices = 128;
-
-	// Structure that wraps .obj 3D model data
-	struct ObjModel
-	{
-		GLfloat m_Vertices[MaxVertices];
-		GLushort m_Indices[MaxIndices];
-
-		SDL_Surface* m_Texture;
-
-		int m_VertexCount, m_IndexCount;
-	};
-
+	
 	// Class for loading .obj models
 	class ObjModelLoader : public IModelLoader
 	{

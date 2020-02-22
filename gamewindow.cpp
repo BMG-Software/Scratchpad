@@ -116,11 +116,11 @@ void GameWindow::Draw() // TOOD: Swap buffers
 	{
 
 		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(model->m_Vertices), &model->m_Vertices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, model->m_Vertices.size() * sizeof(GLfloat), model->m_Vertices.data(), GL_STATIC_DRAW);
 		glVertexAttribPointer(m_AttributeCoord3d, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO); // GL draw elements knows to use what is bound to the ELEMENT_ARRAY_BUFFER
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(model->m_Indices), &model->m_Indices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->m_Indices.size() * sizeof(GLushort), model->m_Indices.data(), GL_STATIC_DRAW);
 
 		// AnimateMVP(m_MVP);
 
@@ -130,7 +130,7 @@ void GameWindow::Draw() // TOOD: Swap buffers
 		glEnableVertexAttribArray(m_AttributeCoord3d);
 		glEnableVertexAttribArray(m_AttributeColour);
 
-		glDrawElements(GL_TRIANGLES, model->m_IndexCount, GL_UNSIGNED_SHORT, (void*)0);
+		glDrawElements(GL_TRIANGLES, (GLsizei)model->m_Indices.size(), GL_UNSIGNED_SHORT, (void*)0);
 
 		glEnableVertexAttribArray(m_AttributeColour);
 		glDisableVertexAttribArray(m_AttributeCoord3d);

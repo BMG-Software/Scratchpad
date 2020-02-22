@@ -9,7 +9,7 @@ GameController::GameController()
 void GameController::Run()
 {
 	Graphics::ObjModel cube;
-	m_ModelLoader.LoadModel("resources/cube.obj", cube);
+	m_ModelLoader.LoadModel("resources/materialcube/cube.obj", cube);
 
 	m_GameWindow.AddDrawableObject(&cube);
 	

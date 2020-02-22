@@ -176,6 +176,7 @@
     <ClInclude Include="glshaderloader.h" />
     <ClInclude Include="imodelloader.h" />
     <ClInclude Include="logger.h" />
+    <ClInclude Include="objmodel.h" />
     <ClInclude Include="objmodelloader.h" />
   </ItemGroup>
   <ItemGroup>

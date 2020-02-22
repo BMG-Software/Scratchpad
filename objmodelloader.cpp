@@ -20,13 +20,14 @@ bool ObjModelLoader::LoadModel(const char* objFilename, ObjModel& obj)
 	bool result = false;
 	InitialiseModel(obj); // Initialise to a clean, known state
 	// All of this is .obj file handling
-	m_FileReader.open(objFilename, std::fstream::in);
-	if (m_FileReader.is_open())
+	std::ifstream filereader;
+	filereader.open(objFilename, std::fstream::in);
+	if (filereader.is_open())
 	{
 		char line[MaxLineLength];
 		do
 		{
-			m_FileReader.getline(line, MaxLineLength);
+			filereader.getline(line, MaxLineLength);
 			if (!LoadMaterial(line, obj))
 			{
 				if (!LoadVertices(line, obj))
@@ -37,23 +38,19 @@ bool ObjModelLoader::LoadModel(const char* objFilename, ObjModel& obj)
 					}
 				}
 			}
-		} while (!m_FileReader.eof());
+		} while (!filereader.eof());
 		result = true;
 	}
-	m_FileReader.close();
+	filereader.close();
 	return result;
 }
 
-void Graphics::ObjModelLoader::InitialiseModel(ObjModel & obj)
+void ObjModelLoader::InitialiseModel(ObjModel & obj) // TODO: Remove
 {
-	obj.m_IndexCount = 0;
-	obj.m_VertexCount = 0;
-	memset(obj.m_Vertices, 0, MaxVertices);
-	memset(obj.m_Indices, 0, MaxIndices);
 	obj.m_Texture = nullptr;
 }
 
-bool Graphics::ObjModelLoader::LoadMaterial(const char * line, ObjModel &)
+bool ObjModelLoader::LoadMaterial(const char * line, ObjModel &)
 {
 	bool result = false;
 	char *token = NULL, *nextToken = NULL;
@@ -70,12 +67,16 @@ bool Graphics::ObjModelLoader::LoadMaterial(const char * line, ObjModel &)
 			// TODO: Load the material file
 
 		}
+		else
+		{
+			m_Logger.LogError("Material file not found");
+		}
 		fileReader.close();
 	}
 	return result;
 }
 
-bool Graphics::ObjModelLoader::LoadTexture(const char * textureFilename, ObjModel & obj)
+bool ObjModelLoader::LoadTexture(const char * textureFilename, ObjModel & obj)
 {
 	obj.m_Texture = IMG_Load(textureFilename);
 	if (obj.m_Texture == nullptr)
@@ -86,28 +87,40 @@ bool Graphics::ObjModelLoader::LoadTexture(const char * textureFilename, ObjMode
 	return true;
 }
 
-bool Graphics::ObjModelLoader::LoadVertices(const char* line, ObjModel& model)
+bool ObjModelLoader::LoadVertices(const char* line, ObjModel& model)
 {
 	bool result = false;
 	char *token = NULL, *nextToken = NULL;
 	char lineCopy[MaxLineLength];
 	strncpy_s(lineCopy, line, MaxLineLength);
-	token = strtok_s(lineCopy, " ", &nextToken); 
-	if (token != NULL && strcmp(token, "v") == 0)
+	char *type = strtok_s(lineCopy, " ", &nextToken); 
+	if (type != NULL)
 	{
 		token = strtok_s(NULL, " ", &nextToken);
 		while (token != NULL)
 		{
-			model.m_Vertices[model.m_VertexCount] = (GLfloat)atof(token);
-			model.m_VertexCount++;
+			if (strcmp(type, "v") == 0)
+			{
+				model.m_Vertices.push_back((GLfloat)atof(token));
+				result = true;
+			}
+			else if (strcmp(type, "vt") == 0)
+			{
+				model.m_TextureCoords.push_back((GLfloat)atof(token));
+				result = true;
+			}
+			else if (strcmp(type, "vn") == 0)
+			{
+				model.m_VertexNormals.push_back((GLfloat)atof(token));
+				result = true;
+			}
 			token = strtok_s(NULL, " ", &nextToken);
 		}
-		result = true;
 	}
 	return result;
 }
 
-bool Graphics::ObjModelLoader::LoadIndices(const char* line, ObjModel& model)
+bool ObjModelLoader::LoadIndices(const char* line, ObjModel& model)
 {
 	bool result = false;
 	char *token = NULL, *nextToken = NULL;
@@ -116,12 +129,18 @@ bool Graphics::ObjModelLoader::LoadIndices(const char* line, ObjModel& model)
 	token = strtok_s(lineCopy, " ", &nextToken);
 	if (token != NULL && strcmp(token, "f") == 0)
 	{
-		token = strtok_s(NULL, " ", &nextToken);
+		token = strtok_s(NULL, " /", &nextToken);
 		while (token != NULL)
 		{
-			model.m_Indices[model.m_IndexCount] = ((GLushort)atoi(token) - 1); // Normalise to reflect 0 based indexing
-			model.m_IndexCount++;
-			token = strtok_s(NULL, " ", &nextToken);
+			// NOTE: This is not robust at all, will probably improve in the future but this
+			// is very low priority for this project
+
+			model.m_Indices.push_back((GLushort)atoi(token) - 1);
+			token = strtok_s(NULL, " /", &nextToken);
+			model.m_TextureIndices.push_back((GLushort)atoi(token) - 1);
+			token = strtok_s(NULL, " /", &nextToken);
+			model.m_NormalIndices.push_back((GLushort)atoi(token) - 1);
+			token = strtok_s(NULL, " /", &nextToken);
 		}
 		result = true;
 	}
