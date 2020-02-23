@@ -43,11 +43,11 @@ namespace Graphics
 		SDL_GLContext m_GLContext;
 
 		GLShaderLoader m_ShaderLoader;
-		GLuint m_ShaderProgram, m_VBO, m_CBO, m_IBO, m_MatrixID;
+		GLuint m_ShaderProgram, m_VBO, m_IBO, m_MatrixID, m_TextureID, m_TexCoords;
 
 		mat4x4 m_MVP;
 
-		GLint m_AttributeCoord3d, m_AttributeColour;
+		GLint m_AttributeCoord3d, m_AttributeTexture, m_UniformTexture;
 
 		std::vector<ObjModel*> m_Models;
 

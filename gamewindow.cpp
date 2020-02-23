@@ -64,15 +64,21 @@ GameWindow::GameWindow() : m_Logger(Logger::Get())
 
 	m_ShaderProgram = m_ShaderLoader.GetShaderProgram(VertexShaderFile, FragmentShaderFile);
 	m_AttributeCoord3d = glGetAttribLocation(m_ShaderProgram, "coord3d");
-	m_AttributeColour = glGetAttribLocation(m_ShaderProgram, "colour");
+	if (m_AttributeCoord3d == -1)
+	{
+		m_Logger.LogError("Could not bind 3D coord attribute");
+	}
+
+	m_AttributeTexture = glGetAttribLocation(m_ShaderProgram, "coordTex");
+	if (m_AttributeTexture == -1)
+	{
+		m_Logger.LogError("Could not bind Tex coord attribute");
+	}
 
 	glGenBuffers(1, &m_VBO); // Bind vertices. Vertices of a cube
 
-	glGenBuffers(1, &m_CBO); // Bind colours. A colour for each vertex
-	glBindBuffer(GL_ARRAY_BUFFER, m_CBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexColours), VertexColours, GL_STATIC_DRAW);
-	glVertexAttribPointer(m_AttributeColour, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		
+	glGenBuffers(1, &m_TexCoords);
+
 	glGenBuffers(1, &m_IBO);
 
 	glEnable(GL_DEPTH_TEST);  // Enabling Z buffer.
@@ -96,7 +102,7 @@ GameWindow::~GameWindow()
 {
 	glDeleteBuffers(1, &m_VBO);
 	glDeleteBuffers(1, &m_IBO);
-	glDeleteBuffers(1, &m_CBO);
+	glDeleteTextures(1, &m_TextureID);
 	glDeleteProgram(m_ShaderProgram);
 	SDL_GL_DeleteContext(m_GLContext);
 	SDL_DestroyWindow(m_Window);
@@ -104,6 +110,13 @@ GameWindow::~GameWindow()
 
 void GameWindow::AddDrawableObject(ObjModel* model)
 {
+	// Load model texture here?
+	glGenTextures(1, &m_TextureID);
+	glBindTexture(GL_TEXTURE_2D, m_TextureID);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, model->m_Material.m_TextureMap->w, model->m_Material.m_TextureMap->h,
+		0, GL_RGBA, GL_UNSIGNED_BYTE, model->m_Material.m_TextureMap->pixels);
+
 	m_Models.push_back(model);
 }
 
@@ -115,10 +128,21 @@ void GameWindow::Draw() // TOOD: Swap buffers
 	for (ObjModel *model : m_Models) // Draw each model we have a reference to
 	{
 
+		glActiveTexture(GL_TEXTURE0);
+		glUniform1i(m_UniformTexture, 0);
+		glBindTexture(GL_TEXTURE_2D, m_TextureID);
+
+
 		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 		glBufferData(GL_ARRAY_BUFFER, model->m_Vertices.size() * sizeof(GLfloat), model->m_Vertices.data(), GL_STATIC_DRAW);
 		glVertexAttribPointer(m_AttributeCoord3d, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
+		glBindBuffer(GL_ARRAY_BUFFER, m_TexCoords);
+		glBufferData(GL_ARRAY_BUFFER, model->m_TextureCoords.size() * sizeof(GLfloat), model->m_TextureCoords.data(), GL_STATIC_DRAW);
+		glVertexAttribPointer(m_AttributeTexture, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+		// TODO: There is an index buffer problem here -> Texture coordinates are not being correctly indexed
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO); // GL draw elements knows to use what is bound to the ELEMENT_ARRAY_BUFFER
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->m_Indices.size() * sizeof(GLushort), model->m_Indices.data(), GL_STATIC_DRAW);
 
@@ -126,13 +150,12 @@ void GameWindow::Draw() // TOOD: Swap buffers
 
 		glUniformMatrix4fv(m_MatrixID, 1, GL_FALSE, &m_MVP[0][0]);
 
-		// TODO: Draw the (eventual) draw queue here
 		glEnableVertexAttribArray(m_AttributeCoord3d);
-		glEnableVertexAttribArray(m_AttributeColour);
+		glEnableVertexAttribArray(m_AttributeTexture);
 
 		glDrawElements(GL_TRIANGLES, (GLsizei)model->m_Indices.size(), GL_UNSIGNED_SHORT, (void*)0);
 
-		glEnableVertexAttribArray(m_AttributeColour);
+		glEnableVertexAttribArray(m_AttributeTexture);
 		glDisableVertexAttribArray(m_AttributeCoord3d);
 
 		// TODO: Unbind buffers for safety here
@@ -156,10 +179,10 @@ void GameWindow::GenerateMVPMatrix(mat4x4 mvp)
 
 void GameWindow::AnimateMVP(mat4x4 mvp)
 {
-	float angle = SDL_GetTicks() / 1000.f * 45;
+	float angle = SDL_GetTicks() / 1000.f * 15;
 	vec3 axisY = { 0, 1, 0 };
-	mat4x4 anim, identity;
-	mat4x4_identity(identity);
+	mat4x4 anim, identity =
+	{ {1.f, 0.f, 0.f, 0.f},{0.f, 1.f, 0.f, 0.f},{0.f, 0.f, 1.f, 0.f},{0.f, 0.f, 0.f, 1.f} };
 	mat4x4_rotate(anim, identity, axisY[0], axisY[1], axisY[2], angle);
 	mat4x4_mul(mvp, mvp, anim);
 }

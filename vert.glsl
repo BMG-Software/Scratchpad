@@ -1,13 +1,13 @@
 #version 330 core
 
 attribute vec3 coord3d;
-attribute vec3 colour;
+attribute vec2 coordTex;
 uniform mat4 mvp;
 
-out vec3 fragmentColour;
+out vec2 coordTexture;
 
 void main()
 {
   gl_Position = mvp * vec4(coord3d, 1.0);
-  fragmentColour = colour;
+  coordTexture = coordTex;
 }

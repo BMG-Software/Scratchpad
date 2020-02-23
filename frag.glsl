@@ -1,7 +1,9 @@
 #version 330 core
 
-in vec3 fragmentColour;
+in vec2 coordTexture;
+uniform sampler2D texture;
+
 void main()
 {
-  gl_FragColor = vec4(fragmentColour, 1.0);
+  gl_FragColor = texture2D(texture, coordTexture);
 }
