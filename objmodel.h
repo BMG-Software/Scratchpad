@@ -10,17 +10,6 @@
 namespace Graphics
 {
 
-	// Temporary values for the maximum vertices and indices
-	static const int MaxVertices		= 1024;
-	static const int MaxIndices			= 1024;
-
-	static const int MaxTextureCoords	= 512;
-	static const int MaxTextureIndices	= 512;
-
-	static const int MaxVertexNormals	= 512;
-	static const int MaxNormalIndices	= 512;
-
-
 	struct TexturedMaterial
 	{
 
@@ -42,12 +31,6 @@ namespace Graphics
 
 		std::vector<GLfloat> m_Vertices;
 		std::vector<GLushort> m_Indices;
-
-		std::vector<GLfloat> m_TextureCoords;
-		std::vector<GLushort> m_TextureIndices;
-
-		std::vector<GLfloat> m_VertexNormals;
-		std::vector<GLushort> m_NormalIndices;
 
 		TexturedMaterial m_Material;
 

@@ -31,6 +31,11 @@ namespace Graphics
 		bool FindMaterialFile(const char* line, TexturedMaterial& mtl);
 		bool LoadMaterial(const char* materialFilename, TexturedMaterial& mtl);
 
+
+		std::vector<GLfloat> m_TempVertices;
+		std::vector<GLfloat> m_TempTextureCoords;
+		std::vector<GLfloat> m_TempNormals;
+
 		Logger& m_Logger;
 		std::ifstream m_FileReader;
 

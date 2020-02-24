@@ -125,7 +125,7 @@ bool ObjModelLoader::LoadMaterial(const char* materialFilename, TexturedMaterial
 	return result;
 }
 
-bool ObjModelLoader::LoadVertices(const char* line, ObjModel& model)
+bool ObjModelLoader::LoadVertices(const char* line, ObjModel&)
 {
 	bool result = false;
 	char *token = NULL, *nextToken = NULL;
@@ -139,17 +139,17 @@ bool ObjModelLoader::LoadVertices(const char* line, ObjModel& model)
 		{
 			if (strcmp(type, "v") == 0)
 			{
-				model.m_Vertices.push_back((GLfloat)atof(token));
+				m_TempVertices.push_back((GLfloat)atof(token));
 				result = true;
 			}
 			else if (strcmp(type, "vt") == 0)
 			{
-				model.m_TextureCoords.push_back((GLfloat)atof(token));
+				m_TempTextureCoords.push_back((GLfloat)atof(token));
 				result = true;
 			}
 			else if (strcmp(type, "vn") == 0)
 			{
-				model.m_VertexNormals.push_back((GLfloat)atof(token));
+				m_TempNormals.push_back((GLfloat)atof(token));
 				result = true;
 			}
 			token = strtok_s(NULL, " ", &nextToken);
@@ -173,12 +173,24 @@ bool ObjModelLoader::LoadIndices(const char* line, ObjModel& model)
 			// NOTE: This is not robust at all, will probably improve in the future but this
 			// is very low priority for this project at this stage. We're all about opengl here
 
-			model.m_Indices.push_back((GLushort)atoi(token) - 1);
+
+			// TODO: some sort of pair to index map to remove duplicates?
+
+			int vertIndex = (atoi(token) - 1) * 3;
+			model.m_Vertices.push_back(m_TempVertices[vertIndex]);
+			model.m_Vertices.push_back(m_TempVertices[vertIndex + 1]);
+			model.m_Vertices.push_back(m_TempVertices[vertIndex + 2]);
 			token = strtok_s(NULL, " /", &nextToken);
-			model.m_TextureIndices.push_back((GLushort)atoi(token) - 1);
+
+			int texIndex = (atoi(token) - 1) * 2;
+			model.m_Vertices.push_back(m_TempTextureCoords[texIndex]);
+			model.m_Vertices.push_back(m_TempTextureCoords[texIndex + 1]);
 			token = strtok_s(NULL, " /", &nextToken);
-			model.m_NormalIndices.push_back((GLushort)atoi(token) - 1);
+
+			// int normIndex = atoi(token) - 1;
+			// TODO: add
 			token = strtok_s(NULL, " /", &nextToken);
+
 		}
 		result = true;
 	}
