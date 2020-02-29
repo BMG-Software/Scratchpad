@@ -9,21 +9,6 @@ static const int PosX = 50, PosY = 50, Width = 640, Height = 480;
 static const char* VertexShaderFile = "vert.glsl";
 static const char* FragmentShaderFile = "frag.glsl";
 
-static const GLfloat VertexColours[] =
-{
-	1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f,
-	1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f,
-	1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f,
-	1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f,
-	1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f,
-	1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f,
-	1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f,
-	1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f,
-	1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f,
-	1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f,
-	1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f,
-	1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f,
-};
 
 void GameWindow::HandleGLErrors(GLenum err)
 {
@@ -76,9 +61,7 @@ GameWindow::GameWindow() : m_Logger(Logger::Get())
 	}
 
 	glGenBuffers(1, &m_VBO); // Bind vertices. Vertices of a cube
-
 	glGenBuffers(1, &m_TexCoords);
-
 	glGenBuffers(1, &m_IBO);
 
 	glEnable(GL_DEPTH_TEST);  // Enabling Z buffer.
@@ -127,7 +110,7 @@ void GameWindow::Draw() // TOOD: Swap buffers
 
 	for (ObjModel *model : m_Models) // Draw each model we have a reference to
 	{
-
+		
 		glActiveTexture(GL_TEXTURE0);
 		glUniform1i(m_UniformTexture, 0);
 		glBindTexture(GL_TEXTURE_2D, m_TextureID);
@@ -135,14 +118,9 @@ void GameWindow::Draw() // TOOD: Swap buffers
 
 		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 		glBufferData(GL_ARRAY_BUFFER, model->m_Vertices.size() * sizeof(GLfloat), model->m_Vertices.data(), GL_STATIC_DRAW);
-		glVertexAttribPointer(m_AttributeCoord3d, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(m_AttributeCoord3d, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
+		glVertexAttribPointer(m_AttributeTexture, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 
-		glBindBuffer(GL_ARRAY_BUFFER, m_TexCoords);
-		glBufferData(GL_ARRAY_BUFFER, model->m_TextureCoords.size() * sizeof(GLfloat), model->m_TextureCoords.data(), GL_STATIC_DRAW);
-		glVertexAttribPointer(m_AttributeTexture, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-
-		// TODO: There is an index buffer problem here -> Texture coordinates are not being correctly indexed
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO); // GL draw elements knows to use what is bound to the ELEMENT_ARRAY_BUFFER
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->m_Indices.size() * sizeof(GLushort), model->m_Indices.data(), GL_STATIC_DRAW);
 

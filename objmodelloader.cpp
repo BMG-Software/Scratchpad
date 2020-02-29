@@ -125,7 +125,37 @@ bool ObjModelLoader::LoadMaterial(const char* materialFilename, TexturedMaterial
 	return result;
 }
 
-bool ObjModelLoader::LoadVertices(const char* line, ObjModel& model)
+void ObjModelLoader::ApplyToModel(const std::vector<GLfloat> &toInsert, ObjModel& model)
+{
+	int cachedIndex = 0;
+	bool equal = model.m_Vertices.size() != 0;
+	for (int i = 0; i < model.m_Vertices.size(); i)
+	{
+		cachedIndex = i;
+		equal = true;
+		for (int j = 0; j < toInsert.size(); j++, i++)
+		{
+			equal &= (model.m_Vertices[i] == toInsert[j]);
+		}
+		if (equal)
+		{
+			break;
+		}
+	}
+
+	if (equal)
+	{
+		model.m_Indices.push_back((GLushort)cachedIndex / (GLushort)toInsert.size());
+	}
+	else
+	{
+		GLushort newElementIndex = (GLushort)model.m_Vertices.size() / (GLushort)toInsert.size();
+		model.m_Indices.push_back(newElementIndex);
+		model.m_Vertices.insert(model.m_Vertices.end(), toInsert.begin(), toInsert.end());
+	}
+}
+
+bool ObjModelLoader::LoadVertices(const char* line, ObjModel&)
 {
 	bool result = false;
 	char *token = NULL, *nextToken = NULL;
@@ -139,17 +169,17 @@ bool ObjModelLoader::LoadVertices(const char* line, ObjModel& model)
 		{
 			if (strcmp(type, "v") == 0)
 			{
-				model.m_Vertices.push_back((GLfloat)atof(token));
+				m_TempVertices.push_back((GLfloat)atof(token));
 				result = true;
 			}
 			else if (strcmp(type, "vt") == 0)
 			{
-				model.m_TextureCoords.push_back((GLfloat)atof(token));
+				m_TempTextureCoords.push_back((GLfloat)atof(token));
 				result = true;
 			}
 			else if (strcmp(type, "vn") == 0)
 			{
-				model.m_VertexNormals.push_back((GLfloat)atof(token));
+				m_TempNormals.push_back((GLfloat)atof(token));
 				result = true;
 			}
 			token = strtok_s(NULL, " ", &nextToken);
@@ -173,12 +203,26 @@ bool ObjModelLoader::LoadIndices(const char* line, ObjModel& model)
 			// NOTE: This is not robust at all, will probably improve in the future but this
 			// is very low priority for this project at this stage. We're all about opengl here
 
-			model.m_Indices.push_back((GLushort)atoi(token) - 1);
+
+			// TODO: some sort of pair to index map to remove duplicates?
+			std::vector<GLfloat> toInsert;
+			
+			int vertIndex = (atoi(token) - 1) * 3;
+			toInsert.push_back(m_TempVertices[vertIndex]);
+			toInsert.push_back(m_TempVertices[vertIndex + 1]);
+			toInsert.push_back(m_TempVertices[vertIndex + 2]);
 			token = strtok_s(NULL, " /", &nextToken);
-			model.m_TextureIndices.push_back((GLushort)atoi(token) - 1);
+
+			int texIndex = (atoi(token) - 1) * 2;
+			toInsert.push_back(m_TempTextureCoords[texIndex]);
+			toInsert.push_back(m_TempTextureCoords[texIndex + 1]);
 			token = strtok_s(NULL, " /", &nextToken);
-			model.m_NormalIndices.push_back((GLushort)atoi(token) - 1);
+
+			// int normIndex = atoi(token) - 1;
+			// TODO: add
 			token = strtok_s(NULL, " /", &nextToken);
+
+			ApplyToModel(toInsert, model);
 		}
 		result = true;
 	}
