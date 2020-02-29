@@ -9,23 +9,6 @@ static const int PosX = 50, PosY = 50, Width = 640, Height = 480;
 static const char* VertexShaderFile = "vert.glsl";
 static const char* FragmentShaderFile = "frag.glsl";
 
-static const GLfloat MeshBuffer[] = {
-	-0.5f, -0.5f,  0.5f, 0.f, 0.f,
-	 0.5f, -0.5f,  0.5f, 1.f, 0.f,
-	-0.5f,  0.5f,  0.5f, 0.f, 1.f,
-	 0.5f,  0.5f,  0.5f, 1.f, 1.f,
-	-0.5f,  0.5f,  0.5f, 0.f, 0.f,
-	 0.5f,  0.5f,  0.5f, 1.f, 0.f,
-	-0.5f,  0.5f, -0.5f, 0.f, 1.f,
-	 0.5f,  0.5f, -0.5f, 1.f, 1.f,
-};
-
-static const GLushort Indices[] = {
-	0, 1, 2,
-	2, 1, 3,
-	4, 5, 6,
-	6, 5, 7
-};
 
 void GameWindow::HandleGLErrors(GLenum err)
 {
@@ -139,7 +122,7 @@ void GameWindow::Draw() // TOOD: Swap buffers
 		glVertexAttribPointer(m_AttributeTexture, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO); // GL draw elements knows to use what is bound to the ELEMENT_ARRAY_BUFFER
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), &Indices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->m_Indices.size() * sizeof(GLushort), model->m_Indices.data(), GL_STATIC_DRAW);
 
 		// AnimateMVP(m_MVP);
 
@@ -148,7 +131,7 @@ void GameWindow::Draw() // TOOD: Swap buffers
 		glEnableVertexAttribArray(m_AttributeCoord3d);
 		glEnableVertexAttribArray(m_AttributeTexture);
 
-		glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_SHORT, (void*)0);
+		glDrawElements(GL_TRIANGLES, (GLsizei)model->m_Indices.size(), GL_UNSIGNED_SHORT, (void*)0);
 
 		glEnableVertexAttribArray(m_AttributeTexture);
 		glDisableVertexAttribArray(m_AttributeCoord3d);

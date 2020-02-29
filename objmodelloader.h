@@ -31,6 +31,8 @@ namespace Graphics
 		bool FindMaterialFile(const char* line, TexturedMaterial& mtl);
 		bool LoadMaterial(const char* materialFilename, TexturedMaterial& mtl);
 
+		void ApplyToModel(const std::vector<GLfloat> &toInsert, ObjModel& model);
+
 
 		std::vector<GLfloat> m_TempVertices;
 		std::vector<GLfloat> m_TempTextureCoords;

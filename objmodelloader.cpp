@@ -125,6 +125,36 @@ bool ObjModelLoader::LoadMaterial(const char* materialFilename, TexturedMaterial
 	return result;
 }
 
+void ObjModelLoader::ApplyToModel(const std::vector<GLfloat> &toInsert, ObjModel& model)
+{
+	int cachedIndex = 0;
+	bool equal = model.m_Vertices.size() != 0;
+	for (int i = 0; i < model.m_Vertices.size(); i)
+	{
+		cachedIndex = i;
+		equal = true;
+		for (int j = 0; j < toInsert.size(); j++, i++)
+		{
+			equal &= (model.m_Vertices[i] == toInsert[j]);
+		}
+		if (equal)
+		{
+			break;
+		}
+	}
+
+	if (equal)
+	{
+		model.m_Indices.push_back((GLushort)cachedIndex / (GLushort)toInsert.size());
+	}
+	else
+	{
+		GLushort newElementIndex = (GLushort)model.m_Vertices.size() / (GLushort)toInsert.size();
+		model.m_Indices.push_back(newElementIndex);
+		model.m_Vertices.insert(model.m_Vertices.end(), toInsert.begin(), toInsert.end());
+	}
+}
+
 bool ObjModelLoader::LoadVertices(const char* line, ObjModel&)
 {
 	bool result = false;
@@ -175,22 +205,24 @@ bool ObjModelLoader::LoadIndices(const char* line, ObjModel& model)
 
 
 			// TODO: some sort of pair to index map to remove duplicates?
-
+			std::vector<GLfloat> toInsert;
+			
 			int vertIndex = (atoi(token) - 1) * 3;
-			model.m_Vertices.push_back(m_TempVertices[vertIndex]);
-			model.m_Vertices.push_back(m_TempVertices[vertIndex + 1]);
-			model.m_Vertices.push_back(m_TempVertices[vertIndex + 2]);
+			toInsert.push_back(m_TempVertices[vertIndex]);
+			toInsert.push_back(m_TempVertices[vertIndex + 1]);
+			toInsert.push_back(m_TempVertices[vertIndex + 2]);
 			token = strtok_s(NULL, " /", &nextToken);
 
 			int texIndex = (atoi(token) - 1) * 2;
-			model.m_Vertices.push_back(m_TempTextureCoords[texIndex]);
-			model.m_Vertices.push_back(m_TempTextureCoords[texIndex + 1]);
+			toInsert.push_back(m_TempTextureCoords[texIndex]);
+			toInsert.push_back(m_TempTextureCoords[texIndex + 1]);
 			token = strtok_s(NULL, " /", &nextToken);
 
 			// int normIndex = atoi(token) - 1;
 			// TODO: add
 			token = strtok_s(NULL, " /", &nextToken);
 
+			ApplyToModel(toInsert, model);
 		}
 		result = true;
 	}
