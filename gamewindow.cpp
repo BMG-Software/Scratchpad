@@ -1,11 +1,11 @@
 #include "gamewindow.h"
 
+#include <map>
+
 using namespace Graphics;
 
 static const char* Title = "Scratchpad";
-
 static const int PosX = 50, PosY = 50, Width = 640, Height = 480;
-
 static const char* VertexShaderFile = "vert.glsl";
 static const char* FragmentShaderFile = "frag.glsl";
 
@@ -51,13 +51,13 @@ GameWindow::GameWindow() : m_Logger(Logger::Get())
 	m_AttributeCoord3d = glGetAttribLocation(m_ShaderProgram, "coord3d");
 	if (m_AttributeCoord3d == -1)
 	{
-		m_Logger.LogError("Could not bind 3D coord attribute");
+		m_Logger.LogError("Could not find 3D coord attribute");
 	}
 
 	m_AttributeTexture = glGetAttribLocation(m_ShaderProgram, "coordTex");
 	if (m_AttributeTexture == -1)
 	{
-		m_Logger.LogError("Could not bind Tex coord attribute");
+		m_Logger.LogError("Could not find Tex coord attribute");
 	}
 
 	glGenBuffers(1, &m_VBO); // Bind vertices. Vertices of a cube
@@ -73,6 +73,10 @@ GameWindow::GameWindow() : m_Logger(Logger::Get())
 	GenerateMVPMatrix(m_MVP);
 
 	m_MatrixID = glGetUniformLocation(m_ShaderProgram, "mvp");
+	if (m_MatrixID == -1)
+	{
+		m_Logger.LogError("Could not find mvp attribute");
+	}
 
 	glViewport(0, 0, Width, Height);
 	glClearColor(0.9f, 0.9f, 0.9f, 0.f);
@@ -103,7 +107,7 @@ void GameWindow::AddDrawableObject(ObjModel* model)
 	m_Models.push_back(model);
 }
 
-void GameWindow::Draw() // TOOD: Swap buffers
+void GameWindow::Draw() 
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(m_ShaderProgram);

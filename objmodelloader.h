@@ -1,8 +1,6 @@
 #ifndef OBJMODELLOADER_H
 #define OBJMODELLOADER_H
 
-#include <fstream>
-
 #include <SDL.h>
 #include <SDL_opengl.h>
 
@@ -39,7 +37,6 @@ namespace Graphics
 		std::vector<GLfloat> m_TempNormals;
 
 		Logger& m_Logger;
-		std::ifstream m_FileReader;
 
 	};
 

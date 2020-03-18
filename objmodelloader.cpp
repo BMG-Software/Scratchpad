@@ -64,6 +64,11 @@ bool ObjModelLoader::FindMaterialFile(const char * line, TexturedMaterial& mtl)
 bool ObjModelLoader::LoadMaterial(const char* materialFilename, TexturedMaterial& mtl)
 {
 	bool result = false;
+
+	m_TempVertices.clear();
+	m_TempTextureCoords.clear();
+	m_TempNormals.clear();
+
 	std::ifstream fileReader;
 	std::string fullFilepath = Fileprefix + std::string(materialFilename);
 	fileReader.open(fullFilepath, std::fstream::in);
@@ -200,11 +205,6 @@ bool ObjModelLoader::LoadIndices(const char* line, ObjModel& model)
 		token = strtok_s(NULL, " /", &nextToken);
 		while (token != NULL)
 		{
-			// NOTE: This is not robust at all, will probably improve in the future but this
-			// is very low priority for this project at this stage. We're all about opengl here
-
-
-			// TODO: some sort of pair to index map to remove duplicates?
 			std::vector<GLfloat> toInsert;
 			
 			int vertIndex = (atoi(token) - 1) * 3;
@@ -218,8 +218,8 @@ bool ObjModelLoader::LoadIndices(const char* line, ObjModel& model)
 			toInsert.push_back(m_TempTextureCoords[texIndex + 1]);
 			token = strtok_s(NULL, " /", &nextToken);
 
+			// TODO: add normals
 			// int normIndex = atoi(token) - 1;
-			// TODO: add
 			token = strtok_s(NULL, " /", &nextToken);
 
 			ApplyToModel(toInsert, model);
