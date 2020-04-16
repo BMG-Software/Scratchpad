@@ -21,7 +21,7 @@ public:
 private:
     vec3 m_Position, m_ViewDirection;
 
-    int m_OldMouseX;
+    int m_OldMouseX, m_OldMouseY;
 
 };
 
