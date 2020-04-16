@@ -97,7 +97,7 @@ GameWindow::~GameWindow()
 void Graphics::GameWindow::SetCamera(Camera *camera)
 {
     m_Camera = camera;
-    m_Camera->SetPosition(vec3{ 0.f, 0.f, 0.0f }); // Set camera to an initial position
+    m_Camera->SetPosition(vec3{ 0.f, 0.f, 0.9f }); // Set camera to an initial position
     // Model, View, Projection
     UpdateMVPMatrix(m_MVP);
 
@@ -138,6 +138,8 @@ void GameWindow::Draw()
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO); // GL draw elements knows to use what is bound to the ELEMENT_ARRAY_BUFFER
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->m_Indices.size() * sizeof(GLushort), model->m_Indices.data(), GL_DYNAMIC_DRAW);
 
+        m_Camera->Rotate();
+
 		// AnimateMVP(m_MVP);
         UpdateMVPMatrix(m_MVP);
 
@@ -160,12 +162,12 @@ void GameWindow::Draw()
 void GameWindow::UpdateMVPMatrix(mat4x4 mvp)
 {
 	mat4x4 projection;
-	mat4x4_perspective(projection, 60.0f, float(Width)/float(Height), 0.1f, 10.0f);
+	mat4x4_perspective(projection, 45.0f, float(Width)/float(Height), 0.1f, 10.0f);
 
 	mat4x4 view;
-    mat4x4_look_at(view, vec3{ 0.f, 2.f, 0.f }, vec3{ 0.f, 0.f, -4.f }, vec3{ 0.f, 1.f, 0.f });
+    //mat4x4_look_at(view, vec3{ 0.f, 2.f, 0.f }, vec3{ 0.f, 0.f, -4.f }, vec3{ 0.f, 1.f, 0.f });
 
-    //m_Camera->GetWorldToViewMatrix(view); 
+    m_Camera->GetWorldToViewMatrix(view); 
 
 	mat4x4 model;
     mat4x4_translate(model, 0.f, 0.f, -0.2f);

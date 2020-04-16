@@ -1,13 +1,17 @@
 #include "camera.h"
 
+#include <SDL.h>
+
 #include <cstring>
 #include <cmath>
+
+#define DegreesToRadians(angleInDegrees) ((angleInDegrees) * (float)M_PI / 180.f)
 
 static vec3 Up = { 0.f, 1.f, 0.f };
 
 Camera::Camera() 
 {
-    // TODO: Check this over and make sure it's the right way of doing it
+    m_OldMouseX = 0;
     float position[3] = { 0.f, 0.f, 0.f };
     memcpy(m_Position, position, sizeof(vec3));
     float direction[3] = { 0.f, 0.f, -1.f };
@@ -26,14 +30,21 @@ void Camera::UpdatePosition(float x, float y, float z)
     m_Position[2] += z;
 }
 
-void Camera::Rotate(float angle)
+void Camera::Rotate()
 {
+    int mouseX = 0, mouseY = 0;
+    SDL_GetMouseState(&mouseX, &mouseY);
+
+    int mouseDeltaX = mouseX - m_OldMouseX;
+
+    float angle = DegreesToRadians(mouseDeltaX);
+
     mat4x4 rotationMatrix = 
     {
-        {        cosf(angle), 0.f, sinf(angle), 0.f},
-        {                0.f, 1.f,         0.f, 0.f},
-        { sinf(angle) * -1.f, 0.f, cosf(angle), 0.f},
-        {                0.f, 0.f,         0.f, 1.f }
+        {        (float)cosf(angle), 0.f, (float)sinf(angle), 0.f},
+        {                            0.f, 1.f,                     0.f, 0.f},
+        { (float)sinf(angle) * -1.f, 0.f, (float)cosf(angle), 0.f},
+        {                            0.f, 0.f,                     0.f, 1.f }
     };
 
     vec4 viewDirection, result;
@@ -42,6 +53,8 @@ void Camera::Rotate(float angle)
     mat4x4_mul_vec4(result, rotationMatrix, viewDirection);
 
     memcpy(m_ViewDirection, result, sizeof(vec3)); // trims off the end
+
+    m_OldMouseX = mouseX;
 
 }
 
