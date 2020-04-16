@@ -9,6 +9,8 @@
 
 static vec3 Up = { 0.f, 1.f, 0.f };
 
+using namespace Graphics;
+
 Camera::Camera() 
 {
     m_OldMouseX = 0;

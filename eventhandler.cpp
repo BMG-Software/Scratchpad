@@ -5,11 +5,7 @@ using namespace Logic;
 
 // Use a map to map keys to callbacks. Run through the keys and callbacks together
 
-Logic::EventHandler::EventHandler()
-{
-}
-
-void Logic::EventHandler::SetCamera(Camera * camera)
+void EventHandler::SetCamera(Graphics::Camera * camera)
 {
     m_Camera = camera;
 }

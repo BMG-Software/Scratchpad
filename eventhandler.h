@@ -14,16 +14,16 @@ namespace Logic
 	{
 
 	public:
-		EventHandler();
+		EventHandler() = default;
 		virtual ~EventHandler() = default;
 
-        void SetCamera(Camera *camera);
+        void SetCamera(Graphics::Camera *camera);
 
 		// Handles SDL events. Returns false if quit event fired
 		bool HandleEvents();
 
     private:
-        Camera *m_Camera;
+        Graphics::Camera *m_Camera;
 
 	};
 
