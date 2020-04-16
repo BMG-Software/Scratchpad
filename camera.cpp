@@ -32,6 +32,7 @@ void Camera::UpdatePosition(float x, float y, float z)
 
 void Camera::Rotate()
 {
+    // TODO: tidy this up
     int mouseX = 0, mouseY = 0;
     SDL_GetMouseState(&mouseX, &mouseY);
 
@@ -42,9 +43,9 @@ void Camera::Rotate()
     mat4x4 rotationMatrix = 
     {
         {        (float)cosf(angle), 0.f, (float)sinf(angle), 0.f},
-        {                            0.f, 1.f,                     0.f, 0.f},
+        {                       0.f, 1.f,                0.f, 0.f},
         { (float)sinf(angle) * -1.f, 0.f, (float)cosf(angle), 0.f},
-        {                            0.f, 0.f,                     0.f, 1.f }
+        {                       0.f, 0.f,               0.f, 1.f }
     };
 
     vec4 viewDirection, result;

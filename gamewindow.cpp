@@ -165,12 +165,10 @@ void GameWindow::UpdateMVPMatrix(mat4x4 mvp)
 	mat4x4_perspective(projection, 45.0f, float(Width)/float(Height), 0.1f, 10.0f);
 
 	mat4x4 view;
-    //mat4x4_look_at(view, vec3{ 0.f, 2.f, 0.f }, vec3{ 0.f, 0.f, -4.f }, vec3{ 0.f, 1.f, 0.f });
-
     m_Camera->GetWorldToViewMatrix(view); 
 
 	mat4x4 model;
-    mat4x4_translate(model, 0.f, 0.f, -0.2f);
+    mat4x4_translate(model, 0.f, 0.f, -1.f);
 	mat4x4 intermediate;
 	mat4x4_mul(intermediate, projection, view); // TODO: offload onto the GPU
 	mat4x4_mul(mvp, intermediate, model);

@@ -28,11 +28,11 @@ bool EventHandler::HandleEvents()
 			}
             else if (e.key.keysym.sym == SDLK_UP)
             {
-                m_Camera->UpdatePosition(0.f, 0.f, -0.1f);
+                m_Camera->UpdatePosition(0.f, 0.1f, 0.f);
             }
             else if (e.key.keysym.sym == SDLK_DOWN)
             {
-                m_Camera->UpdatePosition(0.f, 0.f, 0.1f);
+                m_Camera->UpdatePosition(0.f, -0.1f, 0.f);
             }
 
 			// Any other key events can happily go here :)
