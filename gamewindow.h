@@ -10,10 +10,12 @@
 #undef main
 
 #include <vector>
+#include <memory>
 
 #include "glshaderloader.h"
 #include "logger.h"
 #include "objmodelloader.h"
+#include "camera.h"
 
 namespace Graphics
 {
@@ -26,6 +28,8 @@ namespace Graphics
 		GameWindow();
 		virtual ~GameWindow();
 
+        void SetCamera(Camera *camera);
+
 		void AddDrawableObject(ObjModel* model); // TODO: need a remove as well at some point
 
 		void Draw(); // Update the screen with the rendered content
@@ -33,9 +37,7 @@ namespace Graphics
 	private:
 
 		void HandleGLErrors(GLenum err);
-		void GenerateMVPMatrix(mat4x4 mvp);
-		void AnimateMVP(mat4x4 mvp); // adds a little bit of animation to spin models
-
+		void UpdateMVPMatrix(mat4x4 mvp);
 
 		Logger &m_Logger;
 
@@ -50,6 +52,8 @@ namespace Graphics
 		GLint m_AttributeCoord3d, m_AttributeTexture, m_UniformTexture;
 
 		std::vector<ObjModel*> m_Models;
+
+        Camera *m_Camera;
 
 	};
 

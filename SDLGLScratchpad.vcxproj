@@ -161,6 +161,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="camera.cpp" />
     <ClCompile Include="eventhandler.cpp" />
     <ClCompile Include="gamecontroller.cpp" />
     <ClCompile Include="gamewindow.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="objmodelloader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="camera.h" />
     <ClInclude Include="eventhandler.h" />
     <ClInclude Include="gamecontroller.h" />
     <ClInclude Include="gamewindow.h" />
