@@ -97,7 +97,7 @@ GameWindow::~GameWindow()
 void Graphics::GameWindow::SetCamera(Camera *camera)
 {
     m_Camera = camera;
-    m_Camera->SetPosition(vec3{ 0.f, 0.f, 0.9f }); // Set camera to an initial position
+    m_Camera->SetPosition(vec3{ 0.f, 0.f, 0.0f }); // Set camera to an initial position
     // Model, View, Projection
     UpdateMVPMatrix(m_MVP);
 
@@ -129,12 +129,14 @@ void GameWindow::Draw()
 
 
 		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-		glBufferData(GL_ARRAY_BUFFER, model->m_Vertices.size() * sizeof(GLfloat), model->m_Vertices.data(), GL_STATIC_DRAW);
-		glVertexAttribPointer(m_AttributeCoord3d, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
+		glBufferData(GL_ARRAY_BUFFER, model->m_Vertices.size() * sizeof(GLfloat), model->m_Vertices.data(), GL_DYNAMIC_DRAW);
+		
+        // TODO: Looks like all this can be done just once. Look into
+        glVertexAttribPointer(m_AttributeCoord3d, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
 		glVertexAttribPointer(m_AttributeTexture, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO); // GL draw elements knows to use what is bound to the ELEMENT_ARRAY_BUFFER
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->m_Indices.size() * sizeof(GLushort), model->m_Indices.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->m_Indices.size() * sizeof(GLushort), model->m_Indices.data(), GL_DYNAMIC_DRAW);
 
 		// AnimateMVP(m_MVP);
         UpdateMVPMatrix(m_MVP);
@@ -159,12 +161,15 @@ void GameWindow::UpdateMVPMatrix(mat4x4 mvp)
 {
 	mat4x4 projection;
 	mat4x4_perspective(projection, 60.0f, float(Width)/float(Height), 0.1f, 10.0f);
+
 	mat4x4 view;
-    m_Camera->GetWorldToViewMatrix(view); 
+    mat4x4_look_at(view, vec3{ 0.f, 2.f, 0.f }, vec3{ 0.f, 0.f, -4.f }, vec3{ 0.f, 1.f, 0.f });
+
+    //m_Camera->GetWorldToViewMatrix(view); 
 
 	mat4x4 model;
-	mat4x4_identity(model);
+    mat4x4_translate(model, 0.f, 0.f, -0.2f);
 	mat4x4 intermediate;
-	mat4x4_mul(intermediate, projection, view);
+	mat4x4_mul(intermediate, projection, view); // TODO: offload onto the GPU
 	mat4x4_mul(mvp, intermediate, model);
 }

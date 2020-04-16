@@ -14,6 +14,8 @@ public:
     void SetPosition(vec3 pos);
     void UpdatePosition(float x, float y, float z);
 
+    void Rotate(float value); // Rotate the camera around the Y axis
+
     void GetWorldToViewMatrix(mat4x4 wtv);
 
 private:

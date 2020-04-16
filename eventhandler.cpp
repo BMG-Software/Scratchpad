@@ -34,6 +34,14 @@ bool EventHandler::HandleEvents()
             {
                 m_Camera->UpdatePosition(0.f, 0.f, 0.1f);
             }
+            else if (e.key.keysym.sym == SDLK_LEFT)
+            {
+                m_Camera->Rotate(45.f);
+            }
+            else if (e.key.keysym.sym == SDLK_RIGHT)
+            {
+                m_Camera->Rotate(-45.f);
+            }
 
 			// Any other key events can happily go here :)
 

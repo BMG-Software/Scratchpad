@@ -1,5 +1,7 @@
 #include "camera.h"
+
 #include <cstring>
+#include <cmath>
 
 static vec3 Up = { 0.f, 1.f, 0.f };
 
@@ -22,6 +24,25 @@ void Camera::UpdatePosition(float x, float y, float z)
     m_Position[0] += x;
     m_Position[1] += y;
     m_Position[2] += z;
+}
+
+void Camera::Rotate(float angle)
+{
+    mat4x4 rotationMatrix = 
+    {
+        {        cosf(angle), 0.f, sinf(angle), 0.f},
+        {                0.f, 1.f,         0.f, 0.f},
+        { sinf(angle) * -1.f, 0.f, cosf(angle), 0.f},
+        {                0.f, 0.f,         0.f, 1.f }
+    };
+
+    vec4 viewDirection, result;
+    memset(viewDirection, 0, sizeof(vec4));
+    memcpy(viewDirection, m_ViewDirection, sizeof(vec3));
+    mat4x4_mul_vec4(result, rotationMatrix, viewDirection);
+
+    memcpy(m_ViewDirection, result, sizeof(vec3)); // trims off the end
+
 }
 
 void Camera::GetWorldToViewMatrix(mat4x4 wtv)
