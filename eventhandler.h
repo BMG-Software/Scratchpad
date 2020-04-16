@@ -5,6 +5,8 @@
 
 #include <SDL.h>
 
+#include "camera.h"
+
 namespace Logic
 {
 
@@ -12,11 +14,16 @@ namespace Logic
 	{
 
 	public:
-		EventHandler() = default;
+		EventHandler();
 		virtual ~EventHandler() = default;
+
+        void SetCamera(Camera *camera);
 
 		// Handles SDL events. Returns false if quit event fired
 		bool HandleEvents();
+
+    private:
+        Camera *m_Camera;
 
 	};
 

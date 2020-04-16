@@ -69,8 +69,7 @@ GameWindow::GameWindow() : m_Logger(Logger::Get())
 	glCullFace(GL_BACK); // GL_FRONT, GL_BACK, GL_FRONT_AND_BACK -> options for culling
 	glDepthFunc(GL_LESS);
 
-	// Model, View, Projection
-	GenerateMVPMatrix(m_MVP);
+    m_Camera = nullptr; // Camera not setup yet TODO: add checks for non-setup camera
 
 	m_MatrixID = glGetUniformLocation(m_ShaderProgram, "mvp");
 	if (m_MatrixID == -1)
@@ -93,6 +92,15 @@ GameWindow::~GameWindow()
 	glDeleteProgram(m_ShaderProgram);
 	SDL_GL_DeleteContext(m_GLContext);
 	SDL_DestroyWindow(m_Window);
+}
+
+void Graphics::GameWindow::SetCamera(Camera *camera)
+{
+    m_Camera = camera;
+    m_Camera->SetPosition(vec3{ 0.f, 0.f, 0.9f }); // Set camera to an initial position
+    // Model, View, Projection
+    UpdateMVPMatrix(m_MVP);
+
 }
 
 void GameWindow::AddDrawableObject(ObjModel* model)
@@ -121,14 +129,19 @@ void GameWindow::Draw()
 
 
 		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-		glBufferData(GL_ARRAY_BUFFER, model->m_Vertices.size() * sizeof(GLfloat), model->m_Vertices.data(), GL_STATIC_DRAW);
-		glVertexAttribPointer(m_AttributeCoord3d, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
+		glBufferData(GL_ARRAY_BUFFER, model->m_Vertices.size() * sizeof(GLfloat), model->m_Vertices.data(), GL_DYNAMIC_DRAW);
+		
+        // TODO: Looks like all this can be done just once. Look into
+        glVertexAttribPointer(m_AttributeCoord3d, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
 		glVertexAttribPointer(m_AttributeTexture, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO); // GL draw elements knows to use what is bound to the ELEMENT_ARRAY_BUFFER
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->m_Indices.size() * sizeof(GLushort), model->m_Indices.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->m_Indices.size() * sizeof(GLushort), model->m_Indices.data(), GL_DYNAMIC_DRAW);
+
+        m_Camera->Rotate();
 
 		// AnimateMVP(m_MVP);
+        UpdateMVPMatrix(m_MVP);
 
 		glUniformMatrix4fv(m_MatrixID, 1, GL_FALSE, &m_MVP[0][0]);
 
@@ -146,25 +159,17 @@ void GameWindow::Draw()
 	SDL_GL_SwapWindow(m_Window);
 }
 
-void GameWindow::GenerateMVPMatrix(mat4x4 mvp)
+void GameWindow::UpdateMVPMatrix(mat4x4 mvp)
 {
 	mat4x4 projection;
-	mat4x4_perspective(projection, 45.0f, float(Width)/float(Height), 0.1f, 100.0f);
-	mat4x4 view;
-	mat4x4_look_at(view, vec3{ 4.f, 3.f, 3.f }, vec3{ 0.f, 0.f, 0.f }, vec3{ 0.f, 1.f, 0.f });
-	mat4x4 model;
-	mat4x4_identity(model);
-	mat4x4 intermediate;
-	mat4x4_mul(intermediate, projection, view);
-	mat4x4_mul(mvp, intermediate, model);
-}
+	mat4x4_perspective(projection, 45.0f, float(Width)/float(Height), 0.1f, 10.0f);
 
-void GameWindow::AnimateMVP(mat4x4 mvp)
-{
-	float angle = SDL_GetTicks() / 1000.f * 15;
-	vec3 axisY = { 0, 1, 0 };
-	mat4x4 anim, identity =
-	{ {1.f, 0.f, 0.f, 0.f},{0.f, 1.f, 0.f, 0.f},{0.f, 0.f, 1.f, 0.f},{0.f, 0.f, 0.f, 1.f} };
-	mat4x4_rotate(anim, identity, axisY[0], axisY[1], axisY[2], angle);
-	mat4x4_mul(mvp, mvp, anim);
+	mat4x4 view;
+    m_Camera->GetWorldToViewMatrix(view); 
+
+	mat4x4 model;
+    mat4x4_translate(model, 0.f, 0.f, -1.f);
+	mat4x4 intermediate;
+	mat4x4_mul(intermediate, projection, view); // TODO: offload onto the GPU
+	mat4x4_mul(mvp, intermediate, model);
 }
