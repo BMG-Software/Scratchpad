@@ -3,6 +3,7 @@
 #define CAMERA_H
 
 #include "linmath.h"
+#include "logger.h"
 
 namespace Graphics
 {
@@ -15,7 +16,14 @@ namespace Graphics
         virtual ~Camera() = default;
 
         void SetPosition(vec3 pos);
-        void UpdatePosition(float x, float y, float z);
+
+        void MoveForward();
+
+        void MoveBackward();
+
+        void StrafeLeft();
+
+        void StrafeRight();
 
         void Rotate(); // Rotate the camera around the Y axis
 
@@ -25,6 +33,8 @@ namespace Graphics
         vec3 m_Position, m_ViewDirection;
 
         int m_OldMouseX, m_OldMouseY;
+
+        Logger &m_Logger;
 
     };
 

@@ -22,13 +22,21 @@ bool EventHandler::HandleEvents()
 			{
 				retVal = false;
 			}
-            else if (e.key.keysym.sym == SDLK_UP)
+            else if (e.key.keysym.sym == SDLK_w)
             {
-                m_Camera->UpdatePosition(0.f, 0.1f, 0.f);
+                m_Camera->MoveForward();
             }
-            else if (e.key.keysym.sym == SDLK_DOWN)
+            else if (e.key.keysym.sym == SDLK_s)
             {
-                m_Camera->UpdatePosition(0.f, -0.1f, 0.f);
+                m_Camera->MoveBackward();
+            }
+            else if (e.key.keysym.sym == SDLK_a)
+            {
+                m_Camera->StrafeLeft();
+            }
+            else if (e.key.keysym.sym == SDLK_d)
+            {
+                m_Camera->StrafeRight();
             }
 
 			// Any other key events can happily go here :)

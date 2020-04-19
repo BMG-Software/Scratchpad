@@ -11,7 +11,7 @@ static vec3 Up = { 0.f, 1.f, 0.f };
 
 using namespace Graphics;
 
-Camera::Camera() 
+Camera::Camera() : m_Logger(Logger::Get())
 {
     m_OldMouseX = 0;
     m_OldMouseY = 0;
@@ -26,11 +26,38 @@ void Camera::SetPosition(vec3 pos)
     memcpy(m_Position, pos, sizeof(vec3));
 }
 
-void Camera::UpdatePosition(float x, float y, float z)
+static const float MovementSpeed = 0.1f;
+
+void Camera::MoveForward()
 {
-    m_Position[0] += x;
-    m_Position[1] += y;
-    m_Position[2] += z;
+
+    vec3 movementVector = 
+    { 
+        m_ViewDirection[0] * MovementSpeed, 
+        m_ViewDirection[1] * MovementSpeed, 
+        m_ViewDirection[2] * MovementSpeed
+    };
+
+    vec3 newPosition;
+
+    vec3_add(newPosition, m_Position, movementVector);
+
+    memcpy(m_Position, newPosition, sizeof(vec3));
+}
+
+void Camera::MoveBackward()
+{
+
+}
+
+void Camera::StrafeLeft()
+{
+
+}
+
+void Camera::StrafeRight()
+{
+
 }
 
 void Camera::Rotate()
@@ -45,7 +72,7 @@ void Camera::Rotate()
     float angleX = DegreesToRadians(mouseDeltaX);
     float angleY = DegreesToRadians(mouseDeltaY);
 
-    mat4x4 rotationMatrixY =
+    mat4x4 rotationMatrixY = // Rotation around the y axis (Left and right movement)
     {
         {1.f,          0.f,                 0.f, 0.f },
         {0.f, cosf(angleY), sinf(angleY) * -1.f, 0.f },
@@ -53,7 +80,7 @@ void Camera::Rotate()
         {0.f,          0.f,                 0.f, 1.f }
     };
 
-    mat4x4 rotationMatrixX = 
+    mat4x4 rotationMatrixX = // Rotation around the x axis (Up and down camera movement)
     {
         {        cosf(angleX), 0.f, sinf(angleX), 0.f },
         {                 0.f, 1.f,          0.f, 0.f },
