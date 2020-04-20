@@ -25,7 +25,7 @@ namespace Logic
 		Graphics::GameWindow m_GameWindow;
 		EventHandler m_EventHandler;
 		Graphics::ObjModelLoader m_ModelLoader;
-        Camera m_Camera;
+        Graphics::Camera m_Camera;
 	};
 
 

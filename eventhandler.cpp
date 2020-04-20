@@ -5,11 +5,7 @@ using namespace Logic;
 
 // Use a map to map keys to callbacks. Run through the keys and callbacks together
 
-Logic::EventHandler::EventHandler()
-{
-}
-
-void Logic::EventHandler::SetCamera(Camera * camera)
+void EventHandler::SetCamera(Graphics::Camera * camera)
 {
     m_Camera = camera;
 }
@@ -26,13 +22,21 @@ bool EventHandler::HandleEvents()
 			{
 				retVal = false;
 			}
-            else if (e.key.keysym.sym == SDLK_UP)
+            else if (e.key.keysym.sym == SDLK_w)
             {
-                m_Camera->UpdatePosition(0.f, 0.1f, 0.f);
+                m_Camera->MoveForwardBackward(1);
             }
-            else if (e.key.keysym.sym == SDLK_DOWN)
+            else if (e.key.keysym.sym == SDLK_s)
             {
-                m_Camera->UpdatePosition(0.f, -0.1f, 0.f);
+                m_Camera->MoveForwardBackward(-1);
+            }
+            else if (e.key.keysym.sym == SDLK_a)
+            {
+                m_Camera->StrafeLeftRight(-1);
+            }
+            else if (e.key.keysym.sym == SDLK_d)
+            {
+                m_Camera->StrafeLeftRight(1);
             }
 
 			// Any other key events can happily go here :)

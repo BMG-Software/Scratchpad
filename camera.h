@@ -3,28 +3,37 @@
 #define CAMERA_H
 
 #include "linmath.h"
+#include "logger.h"
 
-class Camera
+namespace Graphics
 {
 
-public:
-    Camera();
-    virtual ~Camera() = default;
+    class Camera
+    {
 
-    void SetPosition(vec3 pos);
-    void UpdatePosition(float x, float y, float z);
+    public:
+        Camera();
+        virtual ~Camera() = default;
 
-    void Rotate(); // Rotate the camera around the Y axis
+        void SetPosition(vec3 pos);
 
-    void GetWorldToViewMatrix(mat4x4 wtv);
+        void MoveForwardBackward(char direction);
 
-private:
-    vec3 m_Position, m_ViewDirection;
+        void StrafeLeftRight(char direction);
 
-    int m_OldMouseX, m_OldMouseY;
+        void Rotate(); // Rotate the camera around the Y axis
 
-};
+        void GetWorldToViewMatrix(mat4x4 wtv);
 
+    private:
+        vec3 m_Position, m_ViewDirection;
 
+        int m_OldMouseX, m_OldMouseY;
+
+        Logger &m_Logger;
+
+    };
+
+}
 
 #endif // CAMERA_H

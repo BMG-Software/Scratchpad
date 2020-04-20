@@ -8,8 +8,11 @@
 #define DegreesToRadians(angleInDegrees) ((angleInDegrees) * (float)M_PI / 180.f)
 
 static vec3 Up = { 0.f, 1.f, 0.f };
+static const float MovementSpeed = 0.1f;
 
-Camera::Camera() 
+using namespace Graphics;
+
+Camera::Camera() : m_Logger(Logger::Get())
 {
     m_OldMouseX = 0;
     m_OldMouseY = 0;
@@ -24,11 +27,37 @@ void Camera::SetPosition(vec3 pos)
     memcpy(m_Position, pos, sizeof(vec3));
 }
 
-void Camera::UpdatePosition(float x, float y, float z)
+void Camera::MoveForwardBackward(char direction)
 {
-    m_Position[0] += x;
-    m_Position[1] += y;
-    m_Position[2] += z;
+    vec3 movementVector = 
+    { 
+        m_ViewDirection[0] * MovementSpeed * direction, 
+        m_ViewDirection[1] * MovementSpeed * direction, 
+        m_ViewDirection[2] * MovementSpeed * direction
+    };
+
+    vec3 newPosition;
+
+    vec3_add(newPosition, m_Position, movementVector);
+
+    memcpy(m_Position, newPosition, sizeof(vec3));
+}
+
+void Camera::StrafeLeftRight(char direction)
+{
+    vec3 strafeVector;
+    vec3_mul_cross(strafeVector, m_ViewDirection, Up);
+
+    strafeVector[0] *= MovementSpeed * direction;
+    strafeVector[1] *= MovementSpeed * direction;
+    strafeVector[2] *= MovementSpeed * direction;
+
+    vec3 newPosition;
+
+    vec3_add(newPosition, m_Position, strafeVector);
+
+    memcpy(m_Position, newPosition, sizeof(vec3));
+
 }
 
 void Camera::Rotate()
@@ -43,20 +72,20 @@ void Camera::Rotate()
     float angleX = DegreesToRadians(mouseDeltaX);
     float angleY = DegreesToRadians(mouseDeltaY);
 
-    mat4x4 rotationMatrixY =
+    mat4x4 rotationMatrixX = // Rotation around the X axis (Up and Down movement)
     {
-        {1.f,          0.f,                 0.f, 0.f },
-        {0.f, cosf(angleY), sinf(angleY) * -1.f, 0.f },
-        {0.f, sinf(angleY),        cosf(angleY), 0.f },
-        {0.f,          0.f,                 0.f, 1.f }
+        { 1.f,          0.f,                 0.f, 0.f },
+        { 0.f, cosf(angleY),       -sinf(angleY), 0.f },
+        { 0.f, sinf(angleY),        cosf(angleY), 0.f },
+        { 0.f,          0.f,                 0.f, 1.f }
     };
 
-    mat4x4 rotationMatrixX = 
+    mat4x4 rotationMatrixY = // Rotation around the Y axis (Left and right movement)
     {
-        {        cosf(angleX), 0.f, sinf(angleX), 0.f },
-        {                 0.f, 1.f,          0.f, 0.f },
-        { sinf(angleX) * -1.f, 0.f, cosf(angleX), 0.f },
-        {                 0.f, 0.f,          0.f, 1.f }
+        { cosf(angleX),  0.f, sinf(angleX), 0.f },
+        {          0.f,  1.f,          0.f, 0.f },
+        { -sinf(angleX), 0.f, cosf(angleX), 0.f },
+        {           0.f, 0.f,          0.f, 1.f }
     };
 
     mat4x4 rotationMatrix;

@@ -154,6 +154,8 @@ void GameWindow::Draw()
 		glDisableVertexAttribArray(m_AttributeCoord3d);
 
 		// TODO: Unbind buffers for safety here
+        glDeleteBuffers(1, &m_VBO);
+        glDeleteBuffers(1, &m_IBO);
 
 	}
 	SDL_GL_SwapWindow(m_Window);
