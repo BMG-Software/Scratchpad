@@ -17,13 +17,9 @@ namespace Graphics
 
         void SetPosition(vec3 pos);
 
-        void MoveForward();
+        void MoveForwardBackward(char direction);
 
-        void MoveBackward();
-
-        void StrafeLeft();
-
-        void StrafeRight();
+        void StrafeLeftRight(char direction);
 
         void Rotate(); // Rotate the camera around the Y axis
 

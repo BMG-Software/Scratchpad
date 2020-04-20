@@ -24,19 +24,19 @@ bool EventHandler::HandleEvents()
 			}
             else if (e.key.keysym.sym == SDLK_w)
             {
-                m_Camera->MoveForward();
+                m_Camera->MoveForwardBackward(1);
             }
             else if (e.key.keysym.sym == SDLK_s)
             {
-                m_Camera->MoveBackward();
+                m_Camera->MoveForwardBackward(-1);
             }
             else if (e.key.keysym.sym == SDLK_a)
             {
-                m_Camera->StrafeLeft();
+                m_Camera->StrafeLeftRight(-1);
             }
             else if (e.key.keysym.sym == SDLK_d)
             {
-                m_Camera->StrafeRight();
+                m_Camera->StrafeLeftRight(1);
             }
 
 			// Any other key events can happily go here :)
