@@ -42,7 +42,7 @@ namespace Graphics
 
     public:
 
-		SDL_Surface* m_TextureMap; // TODO: Proper getter/setter
+		SDL_Surface* m_TextureMap; // TODO: Proper public getter
 
 	};
 
@@ -52,6 +52,7 @@ namespace Graphics
 	{
 
 		std::vector<GLfloat> m_Vertices;
+        std::vector<GLfloat> m_Normals;
 		std::vector<GLushort> m_Indices;
 
 		TexturedMaterial m_Material;

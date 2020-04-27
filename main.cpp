@@ -3,13 +3,21 @@
 #include <SDL_image.h>
 #include "gamecontroller.h"
 
-int WinMain()
+const char *DefaultFilename = "monkey.obj"; // Load our monkey friend by default
+
+int WinMain(int argc, char **argv)
 {
+    std::string filename(DefaultFilename);
+    if (argc == 2)
+    {
+        filename = std::string(argv[1]);
+    }
+
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0 && (IMG_Init(IMG_INIT_PNG)&IMG_INIT_PNG) == IMG_INIT_PNG) // TODO: Move SDL specific stuff into gamewindow
 	{
 		// TODO: Log success
 		Logic::GameController gameController;
-		gameController.Run();
+		gameController.Run(filename);
 	}
 	else
 	{

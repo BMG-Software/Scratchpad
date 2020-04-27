@@ -144,6 +144,8 @@ void GameWindow::Draw()
         // TODO: Looks like all this can be done just once. Look into
         glVertexAttribPointer(m_AttributeCoord3d, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
 		glVertexAttribPointer(m_AttributeTexture, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+        // TODO: One of these for the normals handle in shader (also add this to the shader...)
+
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO); // GL draw elements knows to use what is bound to the ELEMENT_ARRAY_BUFFER
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->m_Indices.size() * sizeof(GLushort), model->m_Indices.data(), GL_DYNAMIC_DRAW);
