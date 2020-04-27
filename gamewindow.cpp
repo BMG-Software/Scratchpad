@@ -106,12 +106,23 @@ void Graphics::GameWindow::SetCamera(Camera *camera)
 void GameWindow::AddDrawableObject(ObjModel* model)
 {
 	// Load model texture here?
-	glGenTextures(1, &m_TextureID);
-	glBindTexture(GL_TEXTURE_2D, m_TextureID);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, model->m_Material.m_TextureMap->w, model->m_Material.m_TextureMap->h,
-		0, GL_RGBA, GL_UNSIGNED_BYTE, model->m_Material.m_TextureMap->pixels);
+    if (model->m_Material.m_TextureMap != nullptr) // We only want to map a texture if the model has one loaded
+    {
+        glGenTextures(1, &m_TextureID);
+        glBindTexture(GL_TEXTURE_2D, m_TextureID);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, model->m_Material.m_TextureMap->w, model->m_Material.m_TextureMap->h,
+            0, GL_RGBA, GL_UNSIGNED_BYTE, model->m_Material.m_TextureMap->pixels);
+    }
+    else
+    {
+        glGenTextures(1, &m_TextureID);
+        GLubyte data[] = { 255, 255, 0, 255 };
+        glBindTexture(GL_TEXTURE_2D, m_TextureID);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
+    }
 	m_Models.push_back(model);
 }
 
@@ -122,11 +133,10 @@ void GameWindow::Draw()
 
 	for (ObjModel *model : m_Models) // Draw each model we have a reference to
 	{
-		
-		glActiveTexture(GL_TEXTURE0);
-		glUniform1i(m_UniformTexture, 0);
-		glBindTexture(GL_TEXTURE_2D, m_TextureID);
 
+        glActiveTexture(GL_TEXTURE0);
+        glUniform1i(m_UniformTexture, 0);
+        glBindTexture(GL_TEXTURE_2D, m_TextureID);
 
 		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 		glBufferData(GL_ARRAY_BUFFER, model->m_Vertices.size() * sizeof(GLfloat), model->m_Vertices.data(), GL_DYNAMIC_DRAW);
@@ -146,12 +156,12 @@ void GameWindow::Draw()
 		glUniformMatrix4fv(m_MatrixID, 1, GL_FALSE, &m_MVP[0][0]);
 
 		glEnableVertexAttribArray(m_AttributeCoord3d);
-		glEnableVertexAttribArray(m_AttributeTexture);
+        glEnableVertexAttribArray(m_AttributeTexture);
 
 		glDrawElements(GL_TRIANGLES, (GLsizei)model->m_Indices.size(), GL_UNSIGNED_SHORT, (void*)0);
 
-		glEnableVertexAttribArray(m_AttributeTexture);
-		glDisableVertexAttribArray(m_AttributeCoord3d);
+        glEnableVertexAttribArray(m_AttributeTexture);
+        glDisableVertexAttribArray(m_AttributeCoord3d);
 
 		// TODO: Unbind buffers for safety here
         glDeleteBuffers(1, &m_VBO);

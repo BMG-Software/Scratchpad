@@ -12,7 +12,7 @@ using namespace Graphics;
 
 static const int MaxLineLength = 256;
 
-static const std::string Fileprefix = "resources/materialcube/";
+static const std::string Fileprefix = "resources/";
 
 ObjModelLoader::ObjModelLoader() : m_Logger(Logger::Get())
 {

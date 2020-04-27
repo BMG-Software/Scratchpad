@@ -11,7 +11,7 @@ GameController::GameController()
 void GameController::Run()
 {
 	Graphics::ObjModel cube;
-	m_ModelLoader.LoadModel("cube.obj", cube);
+	m_ModelLoader.LoadModel("monkey.obj", cube);
 
 
 
