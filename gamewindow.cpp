@@ -60,6 +60,12 @@ GameWindow::GameWindow() : m_Logger(Logger::Get())
 		m_Logger.LogError("Could not find Tex coord attribute");
 	}
 
+    m_AttributeNormal = glGetAttribLocation(m_ShaderProgram, "norm");
+    if (m_AttributeNormal == -1)
+    {
+        m_Logger.LogError("Could not find normal attribute");
+    }
+
 	glGenBuffers(1, &m_VBO); // Bind vertices. Vertices of a cube
 	glGenBuffers(1, &m_TexCoords);
 	glGenBuffers(1, &m_IBO);
@@ -71,10 +77,14 @@ GameWindow::GameWindow() : m_Logger(Logger::Get())
 
     m_Camera = nullptr; // Camera not setup yet TODO: add checks for non-setup camera
 
-	m_MatrixID = glGetUniformLocation(m_ShaderProgram, "mvp");
-	if (m_MatrixID == -1)
+
+
+	m_ModelMatID = glGetUniformLocation(m_ShaderProgram, "model");
+    m_ViewMatID = glGetUniformLocation(m_ShaderProgram, "view");
+    m_ProjMatID = glGetUniformLocation(m_ShaderProgram, "projection");
+	if (m_ModelMatID == -1 || m_ViewMatID == -1 || m_ProjMatID == -1)
 	{
-		m_Logger.LogError("Could not find mvp attribute");
+		m_Logger.LogError("Could not find mvp attributes");
 	}
 
 	glViewport(0, 0, Width, Height);
@@ -99,13 +109,13 @@ void Graphics::GameWindow::SetCamera(Camera *camera)
     m_Camera = camera;
     m_Camera->SetPosition(vec3{ 0.f, 0.f, 0.9f }); // Set camera to an initial position
     // Model, View, Projection
-    UpdateMVPMatrix(m_MVP);
+    UpdateMVPMatrix();
 
 }
 
 void GameWindow::AddDrawableObject(ObjModel* model)
 {
-	// Load model texture here?
+	// Definitely move this to the per model drawing
     if (model->m_Material.m_TextureMap != nullptr) // We only want to map a texture if the model has one loaded
     {
         glGenTextures(1, &m_TextureID);
@@ -142,8 +152,9 @@ void GameWindow::Draw()
 		glBufferData(GL_ARRAY_BUFFER, model->m_Vertices.size() * sizeof(GLfloat), model->m_Vertices.data(), GL_DYNAMIC_DRAW);
 		
         // TODO: Looks like all this can be done just once. Look into
-        glVertexAttribPointer(m_AttributeCoord3d, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
-		glVertexAttribPointer(m_AttributeTexture, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+        glVertexAttribPointer(m_AttributeCoord3d, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), 0);
+		glVertexAttribPointer(m_AttributeTexture, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+        glVertexAttribPointer(m_AttributeNormal, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(5 * sizeof(GLfloat)));
         // TODO: One of these for the normals handle in shader (also add this to the shader...)
 
 
@@ -152,16 +163,17 @@ void GameWindow::Draw()
 
         m_Camera->Rotate();
 
-		// AnimateMVP(m_MVP);
-        UpdateMVPMatrix(m_MVP);
-
-		glUniformMatrix4fv(m_MatrixID, 1, GL_FALSE, &m_MVP[0][0]);
+		glUniformMatrix4fv(m_ModelMatID, 1, GL_FALSE, &m_Model[0][0]);
+        glUniformMatrix4fv(m_ViewMatID, 1, GL_FALSE, &m_View[0][0]);
+        glUniformMatrix4fv(m_ProjMatID, 1, GL_FALSE, &m_Projection[0][0]);
 
 		glEnableVertexAttribArray(m_AttributeCoord3d);
         glEnableVertexAttribArray(m_AttributeTexture);
+        glEnableVertexAttribArray(m_AttributeNormal);
 
 		glDrawElements(GL_TRIANGLES, (GLsizei)model->m_Indices.size(), GL_UNSIGNED_SHORT, (void*)0);
 
+        glDisableVertexAttribArray(m_AttributeNormal);
         glEnableVertexAttribArray(m_AttributeTexture);
         glDisableVertexAttribArray(m_AttributeCoord3d);
 
@@ -173,17 +185,19 @@ void GameWindow::Draw()
 	SDL_GL_SwapWindow(m_Window);
 }
 
-void GameWindow::UpdateMVPMatrix(mat4x4 mvp)
+void GameWindow::UpdateMVPMatrix()
 {
-	mat4x4 projection;
-	mat4x4_perspective(projection, 45.0f, float(Width)/float(Height), 0.1f, 10.0f);
+    // Generate the matrices
 
-	mat4x4 view;
-    m_Camera->GetWorldToViewMatrix(view); 
-
-	mat4x4 model;
-    mat4x4_translate(model, 0.f, 0.f, -1.f);
-	mat4x4 intermediate;
+    // Projection
+	mat4x4_perspective(m_Projection, 45.0f, float(Width)/float(Height), 0.1f, 10.0f);
+    // View
+    m_Camera->GetWorldToViewMatrix(m_View); 
+    // Model
+    mat4x4_translate(m_Model, 0.f, 0.f, -1.f);
+	
+    
+    /*mat4x4 intermediate;
 	mat4x4_mul(intermediate, projection, view); // TODO: offload onto the GPU
-	mat4x4_mul(mvp, intermediate, model);
+	mat4x4_mul(mvp, intermediate, model);*/
 }

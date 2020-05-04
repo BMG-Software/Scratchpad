@@ -1,17 +1,23 @@
 
 #include <SDL.h>
 #include <SDL_image.h>
+#include <Windows.h>
 #include "gamecontroller.h"
 
 const char *DefaultFilename = "monkey.obj"; // Load our monkey friend by default
 
-int WinMain(int argc, char **argv)
+int WinMain(HINSTANCE, HINSTANCE, PSTR lpCmdLine, INT)
 {
     std::string filename(DefaultFilename);
-    if (argc == 2)
+
+    if (lpCmdLine)
+    {
+        filename = std::string(lpCmdLine);
+    }
+    /*if (argc == 2)
     {
         filename = std::string(argv[1]);
-    }
+    }*/
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0 && (IMG_Init(IMG_INIT_PNG)&IMG_INIT_PNG) == IMG_INIT_PNG) // TODO: Move SDL specific stuff into gamewindow
 	{
