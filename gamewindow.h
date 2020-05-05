@@ -47,11 +47,13 @@ namespace Graphics
 		GLShaderLoader m_ShaderLoader;
 		GLuint m_ShaderProgram, m_VBO, m_IBO, m_TextureID, m_TexCoords;
 
-        GLuint m_ModelMatID, m_ViewMatID, m_ProjMatID;
+        GLint m_ModelMatID, m_ViewMatID, m_ProjMatID;
 
 		mat4x4 m_Model, m_View, m_Projection;
 
 		GLint m_AttributeCoord3d, m_AttributeTexture, m_AttributeNormal, m_UniformTexture;
+
+        GLint m_3x3InvTransp;
 
 		std::vector<ObjModel*> m_Models;
 

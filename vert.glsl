@@ -13,7 +13,7 @@ varying vec4 position;						// Position of vertex (and fragment) in world space
 varying vec3 varyingNormalDirection;		// The surface normal vector in world space
 
 uniform mat4 model, view, projection;
-uniform mat3 m_3x3_inv_transp;				// Whatever this is, it needs to be passed in
+uniform mat3 m_3x3_inv_transp;				
 
 out vec2 coordTexture;
 
@@ -23,6 +23,7 @@ void main()
   position = model * vec4(coord3d, 1.0);
   varyingNormalDirection = normalize(m_3x3_inv_transp * norm);
 
-  gl_Position = projection * view * model * vec4(coord3d, 1.0);
+  mat4 mvp = projection * view * model;
+  gl_Position = mvp * vec4(coord3d, 1.0);
   coordTexture = coordTex;
 }

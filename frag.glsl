@@ -116,6 +116,6 @@ void main()
 	totalLighting = totalLighting + diffuseReflection + specularReflection;
   }
   
-  gl_FragColor = vec4(totalLighting, 1.0); // TODO: Apply total lighting to texture texture2D(texture, coordTexture);
+  gl_FragColor = vec4(totalLighting, 1.0);
 
 }

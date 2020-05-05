@@ -77,7 +77,11 @@ GameWindow::GameWindow() : m_Logger(Logger::Get())
 
     m_Camera = nullptr; // Camera not setup yet TODO: add checks for non-setup camera
 
-
+    m_3x3InvTransp = glGetUniformLocation(m_ShaderProgram, "m_3x3_inv_transp");
+    if (m_3x3InvTransp == -1)
+    {
+        m_Logger.LogError("Could not find 3x3InvTransp");
+    }
 
 	m_ModelMatID = glGetUniformLocation(m_ShaderProgram, "model");
     m_ViewMatID = glGetUniformLocation(m_ShaderProgram, "view");
@@ -162,6 +166,19 @@ void GameWindow::Draw()
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->m_Indices.size() * sizeof(GLushort), model->m_Indices.data(), GL_DYNAMIC_DRAW);
 
         m_Camera->Rotate();
+        UpdateMVPMatrix();
+
+        mat4x4 invertedModel;
+        mat4x4_invert(invertedModel, m_Model);
+        mat4x4 transposed;
+        mat4x4_transpose(transposed, invertedModel);
+        
+        vec3 mat3x3[3]; // TODO: fix this dirty mat4x4 to 3x3 conversion
+        memcpy(mat3x3[0], transposed[0], sizeof(vec3));
+        memcpy(mat3x3[1], transposed[1], sizeof(vec3));
+        memcpy(mat3x3[2], transposed[2], sizeof(vec3));
+
+        glUniformMatrix3fv(m_3x3InvTransp, 1, GL_FALSE, &mat3x3[0][0]);
 
 		glUniformMatrix4fv(m_ModelMatID, 1, GL_FALSE, &m_Model[0][0]);
         glUniformMatrix4fv(m_ViewMatID, 1, GL_FALSE, &m_View[0][0]);
