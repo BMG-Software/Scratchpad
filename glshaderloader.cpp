@@ -5,7 +5,7 @@
 
 using namespace Graphics;
 
-static const int ShaderBufferSize = 1024;
+static const int ShaderBufferSize = 4096; // Limit to the length of the shaders in characters
 
 Graphics::GLShaderLoader::GLShaderLoader() : m_Logger(Logger::Get())
 {

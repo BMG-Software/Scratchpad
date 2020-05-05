@@ -19,7 +19,7 @@ namespace Logic
 		virtual ~GameController() = default;
 
 		// Runs up the main loop of the game
-		void Run();
+		void Run(const std::string &objFilename);
 
 	private:
 		Graphics::GameWindow m_GameWindow;

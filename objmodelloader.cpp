@@ -12,7 +12,7 @@ using namespace Graphics;
 
 static const int MaxLineLength = 256;
 
-static const std::string Fileprefix = "resources/materialcube/";
+static const std::string Fileprefix = "resources/";
 
 ObjModelLoader::ObjModelLoader() : m_Logger(Logger::Get())
 {
@@ -218,8 +218,10 @@ bool ObjModelLoader::LoadIndices(const char* line, ObjModel& model)
 			toInsert.push_back(m_TempTextureCoords[texIndex + 1]);
 			token = strtok_s(NULL, " /", &nextToken);
 
-			// TODO: add normals
-			// int normIndex = atoi(token) - 1;
+			int normIndex = (atoi(token) - 1) * 3; // Loading pre-computed normals
+            toInsert.push_back(m_TempNormals[normIndex]);
+            toInsert.push_back(m_TempNormals[normIndex + 1]);
+            toInsert.push_back(m_TempNormals[normIndex + 2]);
 			token = strtok_s(NULL, " /", &nextToken);
 
 			ApplyToModel(toInsert, model);

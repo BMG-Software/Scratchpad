@@ -8,10 +8,10 @@ GameController::GameController()
     m_EventHandler.SetCamera(&m_Camera);
 }
 
-void GameController::Run()
+void GameController::Run(const std::string &objFilename)
 {
 	Graphics::ObjModel cube;
-	m_ModelLoader.LoadModel("cube.obj", cube);
+	m_ModelLoader.LoadModel(objFilename.c_str(), cube);
 
 
 

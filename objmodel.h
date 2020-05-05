@@ -10,8 +10,28 @@
 namespace Graphics
 {
 
-	struct TexturedMaterial
+	class TexturedMaterial
 	{
+    public:
+        TexturedMaterial()
+        {
+            memset(m_AmbientColour, 0, sizeof(GLfloat) * 3);
+            memset(m_DiffuseColour, 0, sizeof(GLfloat) * 3);
+            memset(m_SpecularColour, 0, sizeof(GLfloat) * 3);
+            m_SpecularExponent = 0;
+            m_Dissolved = 0;
+            m_TextureMap = nullptr;
+        }
+
+        virtual ~TexturedMaterial()
+        {
+            if (m_TextureMap != nullptr)
+            {
+                SDL_FreeSurface(m_TextureMap);
+            }
+        }
+
+    private:
 
 		GLfloat m_AmbientColour[3];
 		GLfloat m_DiffuseColour[3];
@@ -20,7 +40,9 @@ namespace Graphics
 
 		GLfloat m_Dissolved; // Transparent
 
-		SDL_Surface* m_TextureMap;
+    public:
+
+		SDL_Surface* m_TextureMap; // TODO: Proper public getter
 
 	};
 
@@ -30,6 +52,7 @@ namespace Graphics
 	{
 
 		std::vector<GLfloat> m_Vertices;
+        std::vector<GLfloat> m_Normals;
 		std::vector<GLushort> m_Indices;
 
 		TexturedMaterial m_Material;
